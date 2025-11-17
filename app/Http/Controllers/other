@@ -1,0 +1,11 @@
+ <a href="{{ route('operations.pdf', $application->id) }}" class="btn btn-primary">Download PDF</a>
+                                            @if($application->approved_document)
+                                                <a href="{{ route('operations.download', $application->id) }}" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    Download
+                                                </a>
+                                            @else
+                                                <span class="text-muted">Not available</span>
+                                            @endif
+
+                                        </td>
