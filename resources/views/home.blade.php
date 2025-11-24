@@ -30,4 +30,6 @@
 </div>
 </div>
 </div>
+<p class="text-center text-primary"><small> &copy; {{ date('Y') }} Ministry of Justice & Labour (MoJLR). All rights reserved.</small></p>
+
 @endsection

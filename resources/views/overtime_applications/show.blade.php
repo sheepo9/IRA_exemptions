@@ -30,4 +30,6 @@
 
     <a href="{{ route('overtime-applications.index') }}" class="btn btn-secondary mt-3">Back</a>
 </div>
+<p class="text-center text-primary"><small> &copy; {{ date('Y') }} Ministry of Justice & Labour (MoJLR). All rights reserved.</small></p>
+
 @endsection

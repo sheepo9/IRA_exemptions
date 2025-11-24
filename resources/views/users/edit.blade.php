@@ -1,6 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar column -->
+        <div class="col-md-3">
+            @include('layouts.sidebar')
+        </div>
+ <div class="col-md-9">
 <div class="row">
     <div class="col-lg-12 margin-tb">
         <div class="pull-left">
@@ -69,6 +76,8 @@
         </div>
     </div>
 </form>
+ </div> 
+</div>
+<p class="text-center text-primary"><small> &copy; {{ date('Y') }} Ministry of Justice & Labour (MoJLR). All rights reserved.</small></p>
 
-<p class="text-center text-primary"><small>Tutorial by ItSolutionStuff.com</small></p>
 @endsection

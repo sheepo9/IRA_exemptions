@@ -1,6 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar column -->
+        <div class="col-md-3">
+            @include('layouts.sidebar')
+        </div>
+ <div class="col-md-9">
 <div class="row">
     <div class="col-lg-12 margin-tb">
         <div class="pull-left">
@@ -54,9 +61,10 @@
             <button type="submit" class="btn btn-primary btn-sm mt-2 mb-3"><i class="fa-solid fa-floppy-disk"></i> Submit</button>
         </div>
     </div>
+    </div>
+    </div>
 </form>
-<p class="mt-4 text-muted small">
-    &copy; {{ date('Y') }} Ministry of Justice & Labour (MOJLr). All rights reserved.
-</p>
+<p class="text-center text-primary"><small> &copy; {{ date('Y') }} Ministry of Justice & Labour (MoJLR). All rights reserved.</small></p>
+
 
 @endsection

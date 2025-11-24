@@ -4,45 +4,30 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
 
-    <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-    <!-- Custom Light Blue Theme -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
-        body {
-            background-color: #fff;
-        }
-        .navbar {
-            background-color: #cce5ff !important;
-        }
-        .navbar-brand, .nav-link, .dropdown-item {
-            color: #004085 !important;
-        }
-        .card {
-            background-color: #f8f9fa;
-            border: 1px solid #b8daff;
-        }
-        .card-body {
-            color: #004085;
-        }
+        body { background-color: #fff; }
+        .navbar { background-color: #cce5ff !important; }
+        .navbar-brand, .nav-link, .dropdown-item { color: #004085 !important; }
+        .card { background-color: #f8f9fa; border: 1px solid #b8daff; }
+        .card-body { color: #004085; }
         .btn-primary {
-            background-color: #339af0;
-            border-color: #339af0;
+            background-color: #339af0; border-color: #339af0;
         }
         .btn-primary:hover {
-            background-color: #228be6;
-            border-color: #228be6;
+            background-color: #228be6; border-color: #228be6;
         }
     </style>
 </head>
@@ -52,12 +37,8 @@
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
                    <img src="{{ asset('images/logo.png') }}" alt="Logo" style="height: 40px; margin-right: 10px;">
-                    Ministry Of Justice and Labour relations 
+                    Ministry of Justice and Labour Relations 
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto"></ul>
@@ -66,37 +47,33 @@
                         @guest
                             @if (Route::has('login'))
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                                    <a class="nav-link" href="{{ route('login') }}">Login</a>
                                 </li>
                             @endif
                             @if (Route::has('register'))
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+                                    <a class="nav-link" href="{{ route('register') }}">Register</a>
                                 </li>
                             @endif
                         @else
-                            <li><a class="nav-link" href="{{ route('users.index') }}">Manage Users</a></li>
-                            <li><a class="nav-link" href="{{ route('roles.index') }}">Manage Role</a></li>
-                            <li><a class="nav-link" href="{{ route('products.index') }}">Manage Product</a></li>
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
-                                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
-                                </a>
-
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="#"
-                                       onclick="event.preventDefault();
-                                                if (confirm('Are you sure you want to log out?')) {
-                                                    document.getElementById('logout-form').submit();
-                                                }">
-                                        {{ __('Logout') }}
-                                    </a>
-
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
-                                </div>
+                                                       <!-- Simple logout button -->
+                  <p>
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" 
+         viewBox="0 0 16 16" style="margin-right:5px;">
+        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4-3a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/>
+        <path d="M14 14s-1-4-6-4-6 4-6 4 1 1 6 1 6-1 6-1z"/>
+    </svg>
+    {{ Auth::user()->name }}
+</p>
+                                                <li class="nav-item">
+                                <form action="{{ route('logout') }}" method="POST">
+                                    @csrf
+                                    <button class="nav-link btn btn-link"
+                                        style="color: #004085; text-decoration: none;"
+                                        onclick="return confirm('Are you sure you want to log out?')">
+                                        Logout
+                                    </button>
+                                </form>
                             </li>
                         @endguest
                     </ul>
@@ -106,18 +83,9 @@
 
         <main class="py-4">
             <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-body">
-                                @yield('content')
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @yield('content')
             </div>
         </main>
     </div>
 </body>
 </html>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>

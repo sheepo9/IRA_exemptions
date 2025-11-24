@@ -78,7 +78,7 @@
           <li class="list-group-item"><a href="{{ route('exemption_variations.create') }}" class="text-decoration-none">Add New</a></li>
         </ul>
       </div>
-
+ @role('Administrator')
       <!-- Exemption Declarations -->
       <div class="card mb-3 shadow-sm">
         <div class="card-header bg-secondary text-white">
@@ -89,6 +89,29 @@
           <li class="list-group-item"><a href="{{ route('exemption_declarations.create') }}" class="text-decoration-none">New Declaration</a></li>
         </ul>
       </div>
+      @endrole
+       @role('Administrator')
+      <!-- Exemption Declarations -->
+      <div class="card mb-3 shadow-sm">
+        <div class="card-header bg-secondary text-white">
+          Manage users
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item"><a href="{{ route('users.index') }}" class="text-decoration-none">View Users</a></li>
+               </ul>
+      </div>
+      @endrole
+       @role('Administrator')
+      <!-- Exemption Declarations -->
+      <div class="card mb-3 shadow-sm">
+        <div class="card-header bg-secondary text-white">
+          Manage Roles
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item"><a href="{{ route('roles.index') }}" class="text-decoration-none">View Roless</a></li>
+            </ul>
+      </div>
+      @endrole
     </div>
   </div>
 
