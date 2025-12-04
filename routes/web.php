@@ -128,6 +128,7 @@ Route::get('/Exemption_Declarations/{id}/approve', [ExemptionDeclarationControll
         ->name('Exemption_Declarations.pdf');
 
 
+    
 
 
 });
