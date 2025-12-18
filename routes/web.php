@@ -1,16 +1,18 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExemptionWagerController;
+use App\Http\Controllers\ExemptionVariationController;
 use App\Http\Controllers\ContinuousOperationController;
 use App\Http\Controllers\OvertimeApplicationController;
 use App\Http\Controllers\ExemptionApplicationController;
-use App\Http\Controllers\ExemptionWagerController;
-use App\Http\Controllers\ExemptionVariationController;
 use App\Http\Controllers\ExemptionDeclarationController;
 Route::get('/', function () {
     return view('welcome');
@@ -127,6 +129,16 @@ Route::get('/Exemption_Declarations/{id}/approve', [ExemptionDeclarationControll
     Route::get('Exemption_Declarations/{id}/pdf', [ExemptionDeclarationController::class, 'downloadPdf'])
         ->name('Exemption_Declarations.pdf');
 
+//_--------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
+//-------------------------------------Exemption Declarations---------------------------------------
+
+       
+
+// Dashboard route
+Route::get('/dashboard', [DashboardController::class, 'index'])
+     ->name('dashboard')
+     ->middleware('auth'); // Optional: add auth middleware if needed
 
     
 
