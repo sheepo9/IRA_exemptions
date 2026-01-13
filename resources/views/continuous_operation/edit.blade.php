@@ -127,12 +127,15 @@
                                 <input type="file" class="form-control" id="shift_roster" name="shift_roster" 
                                        accept=".pdf,.doc,.docx,.xlsx,.xls">
                                 <div class="form-text">
-                                    @if($application->shift_roster)
-                                        Current file: <a href="{{ Storage::disk('public')->url($application->shift_roster) }}" target="_blank">View</a>
-                                    @else
-                                        No file uploaded
-                                    @endif
-                                    <br>Accepted formats: PDF, DOC, DOCX, XLSX, XLS (Max: 2MB)
+                                  @if($application->hasMedia('shift_rosters'))
+                                            <a href="{{ route('operations.shiftRoster.preview', $application->id) }}"
+                                            target="_blank"
+                                            class="btn btn-sm btn-info">
+                                                Preview PDF
+                                            </a>
+
+                                           
+@endif                                   <br>Accepted formats: PDF, DOC, DOCX, XLSX, XLS (Max: 2MB)
                                 </div>
                             </div>
                         </div>

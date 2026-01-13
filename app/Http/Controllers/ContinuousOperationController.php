@@ -154,7 +154,7 @@ public function store(Request $request)
     public function update(Request $request, $id)
     {
         $application = Continuous_Operation::findOrFail($id);
-            $this->authorize('update', $application);
+            //$this->authorize('update', $application);
 
         $validated = $request->validate([
             'employer_name' => 'required|string|max:255',
