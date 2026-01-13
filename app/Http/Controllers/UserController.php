@@ -22,7 +22,7 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-
+  
     public function __construct()
 {
     $this->middleware('permission:user-list|user-create|user-edit|user-delete', ['only' => ['index','store']]);
@@ -30,7 +30,7 @@ class UserController extends Controller
     $this->middleware('permission:user-edit', ['only' => ['edit','update']]);
     $this->middleware('permission:user-delete', ['only' => ['destroy']]);
 }
-
+ 
     public function index(Request $request): View
     {
         $data = User::latest()->paginate(5);

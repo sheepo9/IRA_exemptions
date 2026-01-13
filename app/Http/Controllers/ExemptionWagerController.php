@@ -109,7 +109,9 @@ public function approve(Request $request, $id)
     $app->status = 'Approved';
     $app->save();
 
-    return redirect()->back()->with('success', 'Application approved successfully.');
+    //return redirect()->back()->with('success', 'Application approved successfully.');
+    return redirect()->route('exemption_wagers.index')->with('success', 'Application approved successfully!');
+
 }
 
 

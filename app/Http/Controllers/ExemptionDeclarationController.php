@@ -98,7 +98,9 @@ class ExemptionDeclarationController extends Controller
     $app->status = 'Approved';
     $app->save();
 
-    return redirect()->back()->with('success', 'Application approved successfully.');
+    //return redirect()->back()->with('success', 'Application approved successfully.');
+    return redirect()->route('overtime-applications.index')->with('success', 'Application approved successfully!');
+
 }
 
 

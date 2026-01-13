@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Auth;
-
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -14,14 +14,26 @@ use App\Http\Controllers\ContinuousOperationController;
 use App\Http\Controllers\OvertimeApplicationController;
 use App\Http\Controllers\ExemptionApplicationController;
 use App\Http\Controllers\ExemptionDeclarationController;
+
+
+
+
 Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/dashboard',[DashboardController::class, 'index'], function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
 Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
+require __DIR__.'/auth.php';
 Route::group(['middleware' => ['auth']], function() {
     Route::resource('roles', RoleController::class);
     Route::resource('users', UserController::class);
@@ -128,19 +140,16 @@ Route::get('/Exemption_Declarations/{id}/approve', [ExemptionDeclarationControll
     // ✅ Route for generating or downloading PDF (admin or user)
     Route::get('Exemption_Declarations/{id}/pdf', [ExemptionDeclarationController::class, 'downloadPdf'])
         ->name('Exemption_Declarations.pdf');
-
-//_--------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------
-//-------------------------------------Exemption Declarations---------------------------------------
-
-       
-
-// Dashboard route
-Route::get('/dashboard', [DashboardController::class, 'index'])
-     ->name('dashboard')
-     ->middleware('auth'); // Optional: add auth middleware if needed
-
-    
-
-
+});
+Route::middleware(['auth'])->group(function () {
+Route::get(
+    '/operations/{id}/shift-roster/download',
+    [ContinuousOperationController::class, 'downloadShiftRoster']
+)->name('operations.shiftRoster.download');
+});
+Route::middleware(['auth'])->group(function () {
+Route::get(
+    '/operations/{id}/shift-roster/preview',
+    [ContinuousOperationController::class, 'previewShiftRoster']
+)->name('operations.shiftRoster.preview');
 });

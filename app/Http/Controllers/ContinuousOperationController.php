@@ -55,45 +55,49 @@ class ContinuousOperationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        // ✅ 1. Validate incoming request
-        $validated = $request->validate([
-                'employer_name' => 'required|string|max:255',
-            'registration_number' => 'nullable|string|max:100',
-            'contact_person' => 'nullable|string|max:255',
-            'postal_address' => 'nullable|string|max:255',
-            'telephone' => 'nullable|string|max:50',
-            'email' => 'nullable|email|max:255',
-            'nature_of_business' => 'nullable|string',
-            'motivation' => 'nullable|string',
-            'period' => 'nullable|string|max:255',
-            'employee_categories' => 'nullable|string',
-            'number_of_shifts' => 'nullable|integer',
-            'hours_per_shift' => 'nullable|integer',
-            'off_days' => 'nullable|string|max:255',
-            'shift_roster' => 'nullable|file|mimes:pdf,doc,docx,xlsx,xls|max:2048',
-            'signature' => 'nullable|string|max:255',
-            'date_signed' => 'nullable|date',
-        ]);
+public function store(Request $request)
+{
+    // ✅ 1. Validate request
+    $validated = $request->validate([
+        'employer_name'        => 'required|string|max:255',
+        'registration_number' => 'nullable|string|max:100',
+        'contact_person'      => 'nullable|string|max:255',
+        'postal_address'      => 'nullable|string|max:255',
+        'telephone'           => 'nullable|string|max:50',
+        'email'               => 'nullable|email|max:255',
+        'nature_of_business'  => 'nullable|string',
+        'motivation'          => 'nullable|string',
+        'period'              => 'nullable|string|max:255',
+        'employee_categories' => 'nullable|string',
+        'number_of_shifts'    => 'nullable|integer',
+        'hours_per_shift'     => 'nullable|integer',
+        'off_days'            => 'nullable|string|max:255',
+        'shift_roster'        => 'required|file|mimes:pdf,doc,docx,xlsx,xls|max:2048',
+        'signature'           => 'nullable|string|max:255',
+        'date_signed'         => 'nullable|date',
+    ]);
 
-        // ✅ 2. Handle file upload (if exists)
-        if ($request->hasFile('shift_roster')) {
-            $validated['shift_roster'] = $request->file('shift_roster')->store('shift_rosters', 'public');
-        }
-        // ✅ 3. Assign user_id manually
-            $validated['user_id'] = Auth::id();
+    // ✅ 2. Attach user
+    $validated['user_id'] = Auth::id();
 
-        // ✅ 3. Save record in database
-        Continuous_Operation::create($validated);
+    // ✅ 3. Create application FIRST
+    $application = Continuous_Operation::create($validated);
 
-        // ✅ 4. Redirect back with success message
-        return back()->with('success', 'Application submitted successfully!');
+    // ✅ 4. Upload shift roster via Spatie
+    if ($request->hasFile('shift_roster')) {
+        $application
+            ->addMediaFromRequest('shift_roster')
+            ->usingName('Shift Roster')
+            ->toMediaCollection('shift_rosters');
     }
-      public function show($id)
+
+    return back()->with('success', 'Application submitted successfully!');
+}
+
+        public function show($id)
 {
     $application = Continuous_Operation::findOrFail($id);
-
+   $this->authorize('view', $application);
     if (Auth::user()->hasRole('Administrator')) {
         // Admin sees all pending applications
         $applications = Continuous_operation::where('status', 'Pending')
@@ -150,6 +154,7 @@ class ContinuousOperationController extends Controller
     public function update(Request $request, $id)
     {
         $application = Continuous_Operation::findOrFail($id);
+            $this->authorize('update', $application);
 
         $validated = $request->validate([
             'employer_name' => 'required|string|max:255',
@@ -170,19 +175,18 @@ class ContinuousOperationController extends Controller
             'date_signed' => 'nullable|date',
         ]);
 
-        // ✅ Handle new file upload (if replacing existing one)
-        if ($request->hasFile('shift_roster')) {
-            // Delete old file if it exists
-            if ($application->shift_roster && Storage::disk('public')->exists($application->shift_roster)) {
-                Storage::disk('public')->delete($application->shift_roster);
-            }
-            $validated['shift_roster'] = $request->file('shift_roster')->store('shift_rosters', 'public');
-        }
+     $application->update($validated);
 
-        $application->update($validated);
-
-        return redirect()->route('operations.index')->with('success', 'Application updated successfully!');
+    if ($request->hasFile('shift_roster')) {
+        $application
+            ->clearMediaCollection('shift_rosters')
+            ->addMediaFromRequest('shift_roster')
+            ->toMediaCollection('shift_rosters');
     }
+
+    return redirect()->route('operations.index')
+        ->with('success', 'Application updated successfully!');
+}
 
     /**
      * Remove an application from storage.
@@ -190,7 +194,7 @@ class ContinuousOperationController extends Controller
     public function destroy($id)
     {
         $application = Continuous_Operation::findOrFail($id);
-
+        $this->authorize('delete', $application); 
         // Delete associated file
         if ($application->shift_roster && Storage::disk('public')->exists($application->shift_roster)) {
             Storage::disk('public')->delete($application->shift_roster);
@@ -207,7 +211,9 @@ public function approve(Request $request, $id)
 {
     
     $application = Continuous_Operation::findOrFail($id);
-       $validated = $request->validate([
+      $this->authorize('approve', $application);
+
+    $validated = $request->validate([
         'approved_document' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
     ]);
    Log::debug('Application validated');
@@ -221,8 +227,11 @@ public function approve(Request $request, $id)
     $application->status = 'Approved';
     $application->save();
 
-    return redirect()->back()->with('success', 'Application approved successfully.');
-}
+   // return redirect()->back()->with('success', 'Application approved successfully.');
+    return redirect()->route('operations.index')->with('success', 'Application approved successfully!');
+    }
+
+
 
 
 
@@ -264,6 +273,39 @@ public function downloadpdf($id)
     ]);
 
     return $pdf->download('application_' . $application->employer_name . '.pdf');
+}
+public function downloadShiftRoster($id)
+{
+    $application = Continuous_Operation::findOrFail($id);
+    $this->authorize('downloadShiftRoster', $application);
+    $media = $application->getFirstMedia('shift_rosters');
+
+    if (!$media) {
+        return back()->with('error', 'No shift roster found.');
+    }
+
+    return response()->download(
+        $media->getPath(),
+        'Shift_Roster_' . $application->employer_name . '.' . $media->extension
+    );
+}
+public function previewShiftRoster($id)
+{
+    $application = Continuous_Operation::findOrFail($id);
+     $this->authorize('view', $application);
+    $media = $application->getFirstMedia('shift_rosters');
+
+    if (!$media) {
+        abort(404, 'Shift roster not found');
+    }
+
+    return response()->file(
+        $media->getPath(),
+        [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $media->file_name . '"',
+        ]
+    );
 }
 
 

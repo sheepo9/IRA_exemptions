@@ -33,7 +33,7 @@ class DashboardController extends Controller
             'users'                  => User::count(),
         ];
 
-        return view('dashboard.dashboard', compact(
+        return view('dashboard', compact(
             'exemptionsApplications',
             'declarations',
             'variations',

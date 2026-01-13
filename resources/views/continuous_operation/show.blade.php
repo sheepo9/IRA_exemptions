@@ -86,14 +86,23 @@
                             <tr>
                                 <th>Shift Roster:</th>
                                 <td>
-                                    @if($application->shift_roster)
-                                        <a href="{{ Storage::disk('public')->url($application->shift_roster) }}" 
-                                           target="_blank" class="btn btn-outline-primary btn-sm">
-                                            View File
-                                        </a>
-                                    @else
-                                        N/A
-                                    @endif
+            
+
+@if($application->hasMedia('shift_rosters'))
+    <a href="{{ route('operations.shiftRoster.preview', $application->id) }}"
+       target="_blank"
+       class="btn btn-sm btn-info">
+        Preview PDF
+    </a>
+
+    <a href="{{ route('operations.shiftRoster.download', $application->id) }}"
+       class="btn btn-sm btn-primary">
+        Download
+    </a>
+@endif
+
+
+
                                 </td>
                             </tr>
                         </table>

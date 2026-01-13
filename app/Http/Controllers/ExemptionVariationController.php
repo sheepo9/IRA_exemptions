@@ -95,7 +95,9 @@ class ExemptionVariationController extends Controller
     $app->status = 'Approved';
     $app->save();
 
-    return redirect()->back()->with('success', 'Application approved successfully.');
+    //return redirect()->back()->with('success', 'Application approved successfully.');
+    return redirect()->route('exemption_variations.index')->with('success', 'Application approved successfully!');
+
 }
 
 
