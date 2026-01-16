@@ -13,18 +13,23 @@
 </div>
 
 <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">Application Status</h4>
+    </div>
+
     <div class="card-body">
         @if($applications->count() > 0)
             <div class="table-responsive">
-                <table class="table table-striped">
+                <table class="table table-hover table-bordered align-middle">
+                    <thead class="table-light">
                     <thead>
                         <tr>
                             <th>Employer Name</th>
                             <th>Registration Number</th>
                             <th>Contact Person</th>
-                            
+
                              <th>Status</th>
-                           
+
                             <th>Actions</th>
                             <th>Download</th>
                              @role('Administrator')
@@ -41,15 +46,13 @@
                                 <td>{{ $application->status ?? 'N/A' }}</td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('operations.show', $application->id) }}" 
-                                           class="btn btn-info">View</a>
-                                        <a href="{{ route('operations.edit', $application->id) }}" 
+                                        <a href="{{ route('operations.edit', $application->id) }}"
                                            class="btn btn-warning">Edit</a>
-                                        <form action="{{ route('operations.destroy', $application->id) }}" 
+                                        <form action="{{ route('operations.destroy', $application->id) }}"
                                               method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger" 
+                                            <button type="submit" class="btn btn-danger"
                                                     onclick="return confirm('Are you sure you want to delete this application?')">
                                                 Delete
                                             </button>
@@ -65,7 +68,7 @@
                                 @else
                                     {{-- Normal user downloads the approved document --}}
                                     @if($application->approved_document)
-                                        <a href="{{ route('operations.download', $application->id) }}" 
+                                        <a href="{{ route('operations.download', $application->id) }}"
                                         class="btn btn-outline-primary">
                                             Download Approved Document
                                         </a>
@@ -73,10 +76,10 @@
                                         <span class="text-muted">Not available</span>
                                     @endif
                                 @endif
-                                            @role('Administrator')                                                                          
+                                            @role('Administrator')
                                 <td>
-                                    <a href="{{ route('operations.approve', $application->id) }}" 
-                                           class="btn btn-warning">Approve</a>
+                                    <a href="{{ route('operations.show', $application->id) }}"
+                                           class="btn btn-info">View</a>
                                     </td>@endrole
                             </tr>
                         @endforeach

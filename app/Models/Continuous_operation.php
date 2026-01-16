@@ -30,6 +30,12 @@ class Continuous_operation extends Model implements HasMedia
     'date_signed',
     'status',
     'approved_document',
+     // existing fields...
+    'staff_member_comment',
+    'dd_comment',
+    'ded_comment',
+    'ed_comment',
+    'minister_comment',
 ];
 public function registerMediaCollections(): void
 {

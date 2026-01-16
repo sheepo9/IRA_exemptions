@@ -44,7 +44,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('exemption_wagers', ExemptionWagerController::class);
     Route::resource('exemption_variations', ExemptionVariationController::class);
     Route::resource('exemption_declarations', ExemptionDeclarationController::class);
-    
+
     // custom routes
     Route::post('operations/{id}/approve', [ContinuousOperationController::class, 'approve'])
     ->name('operations.approve');
@@ -152,4 +152,15 @@ Route::get(
     '/operations/{id}/shift-roster/preview',
     [ContinuousOperationController::class, 'previewShiftRoster']
 )->name('operations.shiftRoster.preview');
+});
+Route::get(
+    '/operations/{application}/comments',
+    [OperationCommentController::class, 'store']
+)->name('operations.comments.store');
+
+Route::middleware(['auth'])->group(function () {
+Route::get(
+    '/operations/{application}/staff-comment',
+    [ContinuousOperationController::class, 'saveStaffComment']
+)->name('operations.staff.comment');
 });

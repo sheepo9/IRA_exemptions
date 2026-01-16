@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Continuous_operation;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;  
+use Illuminate\Support\Facades\Auth;
 //use App\Http\Controllers\Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
@@ -41,7 +41,7 @@ class ContinuousOperationController extends Controller
 
     }
         return view('continuous_operation.index', compact('applications'));
-    
+
     }
 
     /**
@@ -114,13 +114,17 @@ public function store(Request $request)
     return view('continuous_operation.show', compact('application', 'applications'));
 }
 
-    
+
     /*
      * Display a specific application.
-     
+
     public function show($id)
     {
-          $application = Continuous_Operation::findOrFail($id);
+
+         $application = Continuous_Operation::with('comments.user')->findOrFail($id);
+          return view('operations.show', compact('application'));
+}
+
 
     // Only Admins should see all applications for approval
     $applications = [];
@@ -194,7 +198,7 @@ public function store(Request $request)
     public function destroy($id)
     {
         $application = Continuous_Operation::findOrFail($id);
-        $this->authorize('delete', $application); 
+        $this->authorize('delete', $application);
         // Delete associated file
         if ($application->shift_roster && Storage::disk('public')->exists($application->shift_roster)) {
             Storage::disk('public')->delete($application->shift_roster);
@@ -209,7 +213,7 @@ public function store(Request $request)
 
 public function approve(Request $request, $id)
 {
-    
+
     $application = Continuous_Operation::findOrFail($id);
       $this->authorize('approve', $application);
 
@@ -223,7 +227,7 @@ public function approve(Request $request, $id)
         $path = $request->file('approved_document')->store('approved_documents', 'public');
         $application->approved_document = $path;
     }
-     
+
     $application->status = 'Approved';
     $application->save();
 
@@ -261,6 +265,22 @@ public function showApprovalForm($id)
     // }
 
     return view('continuous_operation.showApprovalForm', compact('application'));
+}
+
+public function storeStaffComment(Request $request, $application)
+{
+    $request->validate([
+        'staff_member_comment' => 'required|string',
+    ]);
+
+    $application = Continuous_operation::findOrFail($application);
+
+    $application->staff_member_comment = $request->staff_member_comment;
+    $application->save();
+
+    return redirect()
+        ->back()
+        ->with('success', 'Comment saved successfully.');
 }
 
 

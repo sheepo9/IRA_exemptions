@@ -86,7 +86,7 @@
                             <tr>
                                 <th>Shift Roster:</th>
                                 <td>
-            
+
 
 @if($application->hasMedia('shift_rosters'))
     <a href="{{ route('operations.shiftRoster.preview', $application->id) }}"
@@ -135,11 +135,142 @@
                         </table>
                     </div>
                 </div>
+
+                <hr class="my-4">
+
+@role('Administrator')
+    <h5>Approval</h5>
+
+    @if($application->status !== 'Approved')
+        <form action="{{ route('operations.approve', $application->id) }}"
+              method="POST" enctype="multipart/form-data" class="mb-4">
+            @csrf
+
+            <div class="mb-2">
+                <label class="form-label">Upload Approved Document</label>
+                <input type="file"
+                       name="approved_document"
+                       class="form-control"
+                       accept=".pdf,.doc,.docx"
+                       required>
+            </div>
+
+            <button class="btn btn-success">
+                Approve Application
+            </button>
+        </form>
+    @else
+        <span class="badge bg-success">Application Approved</span>
+    @endif
+@endrole
+</div>
+                </div>
+
+
+
+
+<@role('Staff')
+<hr>
+<h5>Staff Member Comment</h5>
+
+<form action="{{ route('operations.staff.comment', $application->id) }}" method="POST">
+    @csrf
+
+    <div class="mb-3">
+        <textarea
+            name="staff_member_comment"
+            class="form-control"
+            rows="4"
+            placeholder="Enter your comment"
+            required
+        >{{ old('staff_member_comment', $application->staff_member_comment) }}</textarea>
+    </div>
+
+    <button class="btn btn-primary">
+        Save Comment
+    </button>
+</form>
+@if($application->staff_member_comment)
+    <div class="border rounded p-3 mt-3">
+        <strong>Staff Comment</strong>
+        <p class="mb-0 mt-2">{{ $application->staff_member_comment }}</p>
+    </div>
+@endif
+@endrole
+
+
+    </div>
+
+
+    </button>
+</form>
+
+
+
+
+{{-- Existing comments --}}
+<hr class="my-4">
+
+<h4>Comments</h4>
+
+
+@if(
+    $application->staff_member_comment ||
+    $application->dd_comment ||
+    $application->ded_comment ||
+    $application->ed_comment ||
+    $application->minister_comment
+)
+
+    @if($application->staff_member_comment)
+        <div class="border rounded p-3 mb-3">
+            <strong>Staff Member</strong>
+            <p class="mb-0 mt-2">{{ $application->staff_member_comment }}</p>
+        </div>
+    @endif
+
+    @if($application->dd_comment)
+        <div class="border rounded p-3 mb-3">
+            <strong>Deputy Director (DD)</strong>
+            <p class="mb-0 mt-2">{{ $application->dd_comment }}</p>
+        </div>
+    @endif
+
+    @if($application->ded_comment)
+        <div class="border rounded p-3 mb-3">
+            <strong>Deputy Executive Director (DED)</strong>
+            <p class="mb-0 mt-2">{{ $application->ded_comment }}</p>
+        </div>
+    @endif
+
+    @if($application->ed_comment)
+        <div class="border rounded p-3 mb-3">
+            <strong>Executive Director (ED)</strong>
+            <p class="mb-0 mt-2">{{ $application->ed_comment }}</p>
+        </div>
+    @endif
+
+    @if($application->minister_comment)
+        <div class="border rounded p-3 mb-3">
+            <strong>Minister</strong>
+            <p class="mb-0 mt-2">{{ $application->minister_comment }}</p>
+        </div>
+    @endif
+
+@else
+    <p class="text-muted">No comments added yet.</p>
+@endif
+
+
+
+</div>
+                </div>
+
                <!-- Timestamps -->
                 <div class="row mt-4">
                     <div class="col-12">
                         <small class="text-muted">
-                            Created: {{ $application->created_at->format('M d, Y H:i') }} | 
+                            Created: {{ $application->created_at->format('M d, Y H:i') }} |
                             Last Updated: {{ $application->updated_at->format('M d, Y H:i') }}
                         </small>
                     </div>
@@ -148,27 +279,60 @@
         </div>
     </div>
 
+    <hr>
 
-       <div class="col-md-10">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">Application status</h4>
-               
+<h5>Status</h5>
+
+<span class="badge bg-{{ $application->status === 'Approved' ? 'success' : 'warning' }}">
+    {{ $application->status }}
+</span>
+
+<hr>
+
+@role('Administrator')
+    <h5>Approval</h5>
+
+    @if($application->status !== 'Approved')
+        <form action="{{ route('operations.approve', $application->id) }}"
+              method="POST"
+              enctype="multipart/form-data"
+              class="mt-3">
+            @csrf
+
+            <div class="mb-2">
+                <label class="form-label">Approved Document</label>
+                <input type="file"
+                       name="approved_document"
+                       class="form-control"
+                       accept=".pdf,.doc,.docx"
+                       required>
             </div>
 
-            <div class="card-body">
-                    @if($applications->count() > 0)
-                        <table class="table table-hover table-bordered align-middle">
-                            <thead class="table-light">
+            <button class="btn btn-success">
+                Approve Application
+            </button>
+        </form>
+    @else
+        <p class="text-success fw-bold mt-2">
+            This application is approved.
+        </p>
+    @endif
+@endrole
+
+
+       <div
+
+
+            </div>
+
+            <div
+
                                 <tr>
-                                    <th>#</th>
-                                    <th>Email</th>
-                                    <th>Period</th>
-                                    <th>Status</th>
-                                    <th>Approved Document</th>
+
                                     @role('Administrator')
-                                        <th>Action</th>
+
                                     @endrole
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -184,7 +348,7 @@
                                         </td>
                                         <td>
                                             @if($app->approved_document)
-                                                <a href="{{ route('operations.download', $application->id) }}" 
+                                                <a href="{{ route('operations.download', $application->id) }}"
                                                    class="btn btn-sm btn-outline-primary">
                                                     Download
                                                 </a>
@@ -196,7 +360,7 @@
                                         @role('Administrator')
                                             <td>
                                                 @if($application->status !== 'Approved')
-                                                    <form action="{{ route('operations.approve', $application->id) }}" 
+                                                    <form action="{{ route('operations.approve', $application->id) }}"
                                                           method="POST" enctype="multipart/form-data" class="d-flex flex-column gap-2">
                                                         @csrf
                                                         <input type="file" name="approved_document" class="form-control form-control-sm" accept=".pdf,.doc,.docx">
@@ -208,12 +372,18 @@
                                             </td>
                                         @endrole
                                     </tr>
+
                                 @endforeach
+
                             </tbody>
-                        </table>
+                            @if($applications->count() > 0)
+    <table class="table table-hover table-bordered align-middle">
+        {{-- table head + body --}}
+    </table>
+
                         {{-- Pagination --}}
                         <div class="d-flex justify-content-center mt-3">
-                            {{ $applications->links() }}
+                               {{ $applications->links() }}
                         </div>
                     @else
                         <p class="text-center text-muted mb-0">No pending applications found.</p>
@@ -253,7 +423,7 @@
             </td>
         @endrole
     </tr>
-</tbody>-->
+</tbody>
 
 
 </div>
