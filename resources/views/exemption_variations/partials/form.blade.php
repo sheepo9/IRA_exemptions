@@ -1,4 +1,36 @@
+
+  <div class="card shadow-sm">
+        <div class="card-body">
+
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h5 class="fw-bold">REPUBLIC OF NAMIBIA</h5>
+                <h6 class="fw-bold">LABOUR ACT, 2007</h6>
+                <p class="mb-1">(Section 139) (Regulation 26(1))</p>
+                <h5 class="fw-bold text-uppercase mt-3">
+                    Application for Exemption or Variation from Chapter 3
+                </h5>
+                <p class="fw-semibold">Form LM 34</p>
+            </div>
+
+            <!-- Instructions -->
+            <div class="alert alert-secondary">
+                <strong>Instruction:</strong><br>
+                Attach hereto a detailed statement supporting the proposed exemption(s) or variation(s)
+                of one or more of the Basic Conditions of Employment, including:
+                <ol class="mb-0 mt-2">
+                    <li>Sections or subsections for which exemption is sought and the reasons therefor;</li>
+                    <li>Sections or subsections proposed for variation, the proposed language, and reasons;</li>
+                    <li>Specification of employees or categories of employees affected;</li>
+                    <li>
+                        Written submission on behalf of affected employees, or evidence of consultation
+                        with employees reflecting their views.
+                    </li>
+                </ol>
+            </div>
+
 <div class="mb-3">
+
     <label>Applicant Name</label>
     <input type="text" name="applicant_name" class="form-control"
         value="{{ old('applicant_name', $exemption_variation->applicant_name ?? '') }}" required>
