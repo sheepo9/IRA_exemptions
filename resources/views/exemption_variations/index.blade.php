@@ -53,13 +53,13 @@
                       <td>
                                 @if(Auth::user()->hasRole('Administrator'))
                                     {{-- Admin downloads the original application PDF --}}
-                                    <a href="{{ route('Exemption_Declarations.pdf', $app->id) }}" class="btn btn-primary">
+                                    <a href="{{ route('Exemption_Variations.pdf', $app->id) }}" class="btn btn-primary">
                                         Download Application PDF
                                     </a>
                                 @else
                                     {{-- Normal user downloads the approved document --}}
                                     @if($app->approved_document)
-                                        <a href="{{ route('Exemption_Declarations.download', $app->id) }}" 
+                                        <a href="{{ route('Exemption_Variations.download', $app->id) }}" 
                                         class="btn btn-outline-primary">
                                             Download Approved Document
                                         </a>
@@ -69,7 +69,7 @@
                                 @endif
                                             @role('Administrator')                                                                          
                                 <td>
-                                    <a href="{{ route('Exemption_Declarations.approve', $app->id) }}" 
+                                    <a href="{{ route('Exemption_Variations.approve', $app->id) }}" 
                                            class="btn btn-warning">Approve</a>
                                     </td>@endrole
                 </tr>

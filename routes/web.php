@@ -113,17 +113,28 @@ Route::get('/Wager_Applications/{id}/approve', [ExemptionWagerController::class,
 //---------------------------------------------------------------------------------------------------
 //-------------------------------------Exemption Variations ---------------------------------------
 // custom routes
-    Route::post('Exemption_Variations/{id}/approve', [ExemptionVariationController::class, 'approve'])
+    Route::post('ExemptionVariations/{id}/approve', [ExemptionVariationController::class, 'approve'])
     ->name('Exemption_Variations.approve');
-Route::get('/Exemption_Variations/{id}/approve', [ExemptionVariationController::class, 'showApprovalForm'])->name('Exemption_Variations.approve.form');
+Route::get('/ExemptionVariations/{id}/approve', [ExemptionVariationController::class, 'showApprovalForm'])->name('Exemption_Variations.approve.form');
 
 // ✅ Route for downloading the approved document
-    Route::get('Exemption_Variations/{id}/download', [ExemptionVariationController::class, 'downloadApprovedDocument'])
+    Route::get('ExemptionVariations/{id}/download', [ExemptionVariationController::class, 'downloadApprovedDocument'])
         ->name('Exemption_Variations.download');
 
     // ✅ Route for generating or downloading PDF (admin or user)
-    Route::get('Exemption_Variations/{id}/pdf', [ExemptionVariationController::class, 'downloadPdf'])
+    Route::get('ExemptionVariations/{id}/pdf', [ExemptionVariationController::class, 'downloadPdf'])
         ->name('Exemption_Variations.pdf');
+Route::get(
+    '/ExemptionVariations/{id}/submission/download',
+    [ExemptionVariationController::class, 'downloadSubmission']
+)->name('submission.download');
+});
+Route::middleware(['auth'])->group(function () {
+Route::get(
+    '/ExemptionVariations/{id}/submission/preview',
+    [ExemptionVariationController::class, 'previewSubmission']
+)->name('submission.preview');
+});
 
 //_--------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------
@@ -140,7 +151,7 @@ Route::get('/Exemption_Declarations/{id}/approve', [ExemptionDeclarationControll
     // ✅ Route for generating or downloading PDF (admin or user)
     Route::get('Exemption_Declarations/{id}/pdf', [ExemptionDeclarationController::class, 'downloadPdf'])
         ->name('Exemption_Declarations.pdf');
-});
+
 Route::middleware(['auth'])->group(function () {
 Route::get(
     '/operations/{id}/shift-roster/download',
@@ -153,3 +164,7 @@ Route::get(
     [ContinuousOperationController::class, 'previewShiftRoster']
 )->name('operations.shiftRoster.preview');
 });
+
+Route::get('/exemption-variation/declaration', 
+    [ExemptionVariationController::class, 'declarationView']
+)->name('exemption-variation.declaration');

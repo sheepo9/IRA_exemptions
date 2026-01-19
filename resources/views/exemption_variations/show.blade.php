@@ -13,11 +13,36 @@
     <div class="card p-4">
         <p><strong>Applicant Name:</strong> {{ $exemption_variation->applicant_name }}</p>
         <p><strong>Address:</strong> {{ $exemption_variation->address }}</p>
-        <p><strong>Sections Sought:</strong> {{ $exemption_variation->sections_sought }}</p>
+        <p><strong>Sections Sought:</strong> 
+        @if($exemption_variation->sections->isNotEmpty())
+            {{ $exemption_variation->sections->pluck('name')->join(', ') }}
+        @else
+            N/A
+        @endif
+    </p>
         <p><strong>Categories Affected:</strong> {{ $exemption_variation->categories_affected }}</p>
         <p><strong>Representative:</strong> {{ $exemption_variation->representative_name }}</p>
         <p><strong>Position:</strong> {{ $exemption_variation->position }}</p>
         <p><strong>Application Date:</strong> {{ $exemption_variation->application_date }}</p>
+        <p><strong>Submission Document:</strong>
+            @if($exemption_variation->getFirstMediaUrl('submission_document'))
+                <a href="{{ $exemption_variation->getFirstMediaUrl('submission_document') }}" target="_blank">View Document</a>
+            @else
+                No document uploaded.
+            @endif
+        </p>
+        <p>@if($exemption_variation->hasMedia('submission_document'))
+    <a href="{{ route('submission.preview', $exemption_variation->id) }}"
+       target="_blank"
+       class="btn btn-sm btn-info">
+        Preview PDF
+    </a>
+
+    <a href="{{ route('submission.download', $exemption_variation->id) }}"
+       class="btn btn-sm btn-primary">
+        Download
+    </a>
+@endif</p>
     </div>
     <a href="{{ route('exemption_variations.edit', $exemption_variation->id) }}" class="btn btn-warning mt-3">Edit</a>
     <a href="{{ route('exemption_variations.index') }}" class="btn btn-secondary mt-3">Back</a>

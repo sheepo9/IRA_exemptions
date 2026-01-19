@@ -39,7 +39,11 @@
         </tr>
         <tr>
             <td class="label">Sections of the Labour Act, 2007, from which exemption or variation is sought.</td>
-            <td class="value">{{ $application->sections_sought }}</td>
+            <td class="value">  @if($application->sections->isNotEmpty())
+            {{ $application->sections->pluck('name')->join(', ') }}
+        @else
+            N/A
+        @endif</td>
         </tr>
         <tr>
             <td class="label">Category or categories of employees that would be affected by exemption or variation</td>

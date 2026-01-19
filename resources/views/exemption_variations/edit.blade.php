@@ -10,7 +10,7 @@
  <div class="col-md-9">
 <div class="container">
     <h2>Edit Application</h2>
-    <form action="{{ route('exemption_variations.update', $exemption_variation->id) }}" method="POST">
+    <form action="{{ route('exemption_variations.update', $exemption_variation->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         @include('exemption_variations.partials.form', ['exemption_variation' => $exemption_variation])

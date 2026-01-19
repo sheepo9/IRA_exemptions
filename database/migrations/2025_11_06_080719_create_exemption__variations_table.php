@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('exemption__variations', function (Blueprint $table) {
+        Schema::create('exemption_variations', function (Blueprint $table) {
             $table->id();
             $table->string('applicant_name');
         $table->string('address');
-        $table->text('sections_sought');  // Sections from which exemption/variation is sought
+       // $table->text('sections_sought');  // Sections from which exemption/variation is sought
         $table->text('categories_affected')->nullable();  // Employees affected
         $table->string('representative_name');
         $table->string('position')->nullable();
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('exemption__variations');
+        Schema::dropIfExists('exemption_variations');
     }
 };
