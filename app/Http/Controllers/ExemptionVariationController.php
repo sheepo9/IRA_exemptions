@@ -20,7 +20,9 @@ class ExemptionVariationController extends Controller
 
     public function index()
     {
-        $applications = ExemptionVariation::latest()->paginate(10);
+         $applications = ExemptionVariation::where('status', 'Pending')
+        ->latest()
+        ->get();
         return view('exemption_variations.index', compact('applications'));
     }
 
@@ -143,30 +145,84 @@ class ExemptionVariationController extends Controller
     }
   
    
-    public function approve(Request $request, $id)
-        {
-    
-    $app = ExemptionVariation::findOrFail($id);
-       $validated = $request->validate([
-        'approved_document' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
+   public function approve($id)
+{
+    $application = ExemptionVariation::findOrFail($id);
+
+    $application->update([
+        'status' => 'approved',
     ]);
-  // Log::debug('Application validated');
-    // Upload approved document if provided
-    if ($request->hasFile('approved_document')) {
-          //Log::debug('File exists');
-        $path = $request->file('approved_document')->store('approved_documents', 'public');
-        $app->approved_document = $path;
-    }
-     
-    $app->status = 'Approved';
-    $app->save();
 
-    //return redirect()->back()->with('success', 'Application approved successfully.');
-    return redirect()->route('exemption_variations.index')->with('success', 'Application approved successfully!');
+    return redirect()
+        ->route('exemption-variation.declaration')
+        ->with('success', 'Application approved and moved to reviewed list.');
+}
 
+public function review($id)
+{
+    $application = ExemptionVariation::findOrFail($id);
+
+    $application->update([
+        'status' => 'Reviewed'
+    ]);
+
+   return redirect()
+        ->route('exemption_variations.index')
+        ->with('success', 'Application  moved to reviewed list.');
+}
+
+public function reviewed()
+{
+    $applications = ExemptionVariation::where('status', 'Reviewed')
+        ->orderBy('application_date', 'desc')
+        ->get();
+
+    return view('exemption_variations.review', compact('applications'));
+}
+
+public function comment(Request $request, ExemptionVariation $exemption_variation)
+{
+    $request->validate([
+        'reviewer_comments' => 'required|string',
+           ]);
+
+    $exemption_variation->update([
+        'reviewer_comments' => $request->reviewer_comments,
+            ]);
+
+    return redirect()
+        ->route('exemption_variations.index')
+        ->with('success', 'Review submitted successfully.');
+}
+
+public function ministerDecision(Request $request, ExemptionVariation $exemption_variation)
+{
+    $request->validate([
+        'minister_comments' => 'required|string',
+       // 'status' => 'required|in:Completed,Rejected',
+    ]);
+
+    $exemption_variation->update([
+        'minister_comments' => $request->minister_comments,
+        //'status' => $request->status,
+    ]);
+
+    return redirect()
+        ->route('exemption_variations.completed')
+        ->with('success', 'Minister comment recorded successfully.');
 }
 
 
+
+
+public function completed()
+{
+    $applications = ExemptionVariation::where('status', 'Approved')
+        ->orderBy('application_date', 'desc')
+        ->get();
+
+    return view('exemption_variations.completed', compact('applications'));
+}
 
 public function downloadApprovedDocument($id)
 {
@@ -240,7 +296,11 @@ public function previewSubmission($id)
 }
 public function declarationView()
     {
-         $applications = ExemptionVariation::latest()->paginate(10);
+          $applications = ExemptionVariation::where('status', 'reviewed')
+        ->latest()
+        ->get();
        return view('exemption_variations.declarationView', compact('applications'));
     }
+
+    
 }

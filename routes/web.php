@@ -135,6 +135,29 @@ Route::get(
     [ExemptionVariationController::class, 'previewSubmission']
 )->name('submission.preview');
 });
+Route::post(
+    '/exemption-variations/{id}/approve',
+    [ExemptionVariationController::class, 'review']
+)->name('exemption_variations.approve');
+
+Route::get(
+    '/exemption-variations/reviewed',
+    [ExemptionVariationController::class, 'reviewed']
+)->name('exemption_variations.reviewed');
+
+Route::get('/exemption-variations/completed', 
+    [ExemptionVariationController::class, 'completed']
+)->name('exemption_variations.completed');
+
+Route::put(
+    '/exemption-variations/{exemption_variation}/comment',
+    [ExemptionVariationController::class, 'comment']
+)->name('exemption_variations.comment');
+
+Route::put(
+    '/exemption_variations/{exemption_variation}/minister',
+    [ExemptionVariationController::class, 'ministerDecision']
+)->name('exemption_variations.minister');
 
 //_--------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------

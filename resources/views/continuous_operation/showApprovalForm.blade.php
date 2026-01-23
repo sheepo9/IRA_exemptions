@@ -62,7 +62,7 @@
 
             <!-- Action Buttons -->
             <div class="d-flex justify-content-end">
-                <a href="{{ route('users.index') }}" class="btn btn-secondary me-2">
+                <a href="{{ route('operations.index') }}" class="btn btn-secondary me-2">
                     <i class="bi bi-arrow-left-circle"></i> Back
                 </a>
              </div>

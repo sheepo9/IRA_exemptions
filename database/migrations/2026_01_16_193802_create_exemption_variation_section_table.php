@@ -11,28 +11,25 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('exemption_variation_section', function (Blueprint $table) {
+   Schema::create('exemption_variation_section', function (Blueprint $table) {
     $table->id();
 
-    $table->unsignedBigInteger('exemption_variation_id');
-    $table->unsignedBigInteger('section_id');
+    $table->foreignId('exemption_variation_id')
+          ->constrained('exemption_variations')
+          ->cascadeOnDelete();
 
-    $table->foreign('exemption_variation_id', 'evs_ev_fk')
-          ->references('id')
-          ->on('exemption_variations')
-          ->onDelete('cascade');
+    $table->foreignId('section_id')
+          ->constrained('sections')
+          ->cascadeOnDelete();
 
-    $table->foreign('section_id', 'evs_section_fk')
-          ->references('id')
-          ->on('sections')
-          ->onDelete('cascade');
+    $table->timestamps();
 
-    // 👇 SHORT index name (VERY IMPORTANT)
     $table->unique(
         ['exemption_variation_id', 'section_id'],
         'evs_unique'
     );
 });
+
 
     }
 

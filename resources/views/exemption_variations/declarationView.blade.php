@@ -15,8 +15,7 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    <a href="{{ route('exemption_variations.create') }}" class="btn btn-primary mb-3">View Pending Declariontions</a>
-<a href="{{ route('exemption_variations.create') }}" class="btn btn-primary mb-3">>View Completed Declariontions</a>
+    <a href="{{ route('exemption_variations.completed') }}" class="btn btn-primary mb-3">View Completed Declarations</a>
 
     <table class="table table-bordered">
         <thead>
@@ -48,8 +47,7 @@
         </tbody>
     </table>
 
-    {{ $applications->links() }}
-</div>
+ </div>
 </div>
 </div>
 </div>

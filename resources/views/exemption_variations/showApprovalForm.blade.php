@@ -36,29 +36,34 @@
         <p>
             <strong>1.</strong> Exempt (full name of the Applicant(s)):
             <span class="border-bottom d-inline-block px-3">
-                Example Company (Pty) Ltd
+              {{$application->applicant_name}}
             </span>
             located at (physical address):
             <span class="border-bottom d-inline-block px-3">
-                123 Independence Avenue, Windhoek
+                {{$application->address}}
             </span>
             from compliance with the Sections of Chapter 3, Basic Conditions of Employment,
             set forth below in respect of the following categories of employees and subject
             to the following conditions, if any:
         </p>
 
-        <div class="ms-4">
+        <div class="ms-1">
             
-            <p>1.1 <span class="border-bottom d-inline-block w-75">@if($application->sections->isNotEmpty())
-            {{ $application->sections->pluck('name')->join(', ') }}
-        @else
-            N/A
-        @endif</span></p>
-            <p>1.2 <span class="border-bottom d-inline-block w-75">Section 21 – Overtime</span></p>
-            <p>1.3 <span class="border-bottom d-inline-block w-75">Section 22 – Night Work</span></p>
-            <p>1.4 <span class="border-bottom d-inline-block w-75">Section 23 – Leave Entitlement</span></p>
-            <p>1.5 <span class="border-bottom d-inline-block w-75">Special conditions as approved</span></p>
-        </div>
+            <p>
+            <span class="d-inline-block w-75 ps-0">
+                @if($application->sections->isNotEmpty())
+                    <ol class="mb-0">
+                        @foreach($application->sections as $section)
+                            <li>{{ $section->name }}</li>
+                        @endforeach
+                    </ol>
+                @else
+                    N/A
+                @endif
+            </span>
+
+            </p>
+                   </div>
 
         <p class="mt-3">
             <strong>2.</strong> Vary the sections of Chapter 3, Basic Conditions of Employment
@@ -89,13 +94,54 @@
             </p>
             <p>
                 Date: <span class="border-bottom d-inline-block px-4">{{ now()->format('d F Y') }}
-</span>
             </p>
         </div>
 
         </div>
 </div>
+<hr>
+@if($application->status !== 'approved')
+    <form action="{{ route('exemption_variations.approve', $application->id) }}"
+          method="POST"
+          onsubmit="return confirm('Are you sure you want to approve this application?');">
+        @csrf
+        <button type="submit" class="btn btn-success mb-3">
+            Approve Application
+        </button>
+    </form>
+@endif
+<hr>
+@if($application->status === 'Reviewed')
+<div class="card mt-4">
+    <div class="card-header fw-bold">
+        Minister Decision
+    </div>
 
+    <div class="card-body">
+        <form action="{{ route('exemption_variations.minister', $application->id) }}"
+              method="POST">
+            @csrf
+            @method('PUT')
+
+            <div class="mb-3">
+                <label class="form-label">Minister Comments</label>
+                <textarea name="minister_comments"
+                          class="form-control"
+                          rows="4"
+                          required>{{ old('minister_comments') }}</textarea>
+            </div>
+
+           
+
+            <button class="btn btn-success">
+               Add comment
+            </button>
+        </form>
+    </div>
+</div>
+@endif
+
+<a href="{{ url()->previous() }}" class="btn btn-secondary mb-3">   Back</a>
 </div>
 </div></div></div></div>
 @endsection

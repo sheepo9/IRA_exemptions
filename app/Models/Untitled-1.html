@@ -1,0 +1,198 @@
+<script>
+
+     function showError(message) {
+    const errorBox = document.getElementById('errorBox');
+    errorBox.textContent = message;
+    errorBox.style.display = 'block';
+  }
+
+  function clearError() {
+    const errorBox = document.getElementById('errorBox');
+    errorBox.style.display = 'none';
+  }
+
+  function calculateWage() {
+    clearError();
+
+    const hourlyRate = parseFloat(document.getElementById('hourlyRate').value);
+    const hoursPerDay = parseFloat(document.getElementById('hoursPerDay').value);
+    const daysPerWeek = parseFloat(document.getElementById('daysPerWeek').value);
+    const overtimeHours = parseFloat(document.getElementById('overtimeHours').value) || 0;
+    const sundayHours = parseFloat(document.getElementById('sundayHours').value) || 0;
+
+    if (isNaN(hourlyRate) || isNaN(hoursPerDay) || isNaN(daysPerWeek)) {
+      showError("⚠️ Please fill in all required fields: hourly rate, hours per day, and days worked.");
+      return;
+    }
+
+    if (hoursPerDay > 24 || hoursPerDay < 1) {
+      showError("⚠️ Invalid number of hours per day. It must be between 1 and 24.");
+      return;
+    }
+
+    if (daysPerWeek > 7 || daysPerWeek < 1) {
+      showError("⚠️ Invalid number of days per week. It must be between 1 and 7.");
+      return;
+    }
+
+    const dailyPay = hourlyRate * hoursPerDay;
+    const weeklyPay = dailyPay * daysPerWeek;
+    const monthlyPay = weeklyPay * 4;
+
+    const overtimePay = overtimeHours * hourlyRate * 1.5;
+    const sundayPay = sundayHours * hourlyRate * 2;
+
+    const totalDailyPay = overtimePay + dailyPay
+    const totalWeekly = weeklyPay + overtimePay + sundayPay;
+    const totalMonthly = totalWeekly * 4;
+
+    document.getElementById('results').innerHTML = `
+
+       <p><strong>Total Daily Pay :</strong> N$ ${totalDailyPay.toFixed(2)}</p>
+      <p><strong>Total Weekly Pay :</strong> N$ ${totalWeekly.toFixed(2)}</p>
+      <p><strong>Total Monthly Pay :</strong> N$ ${totalMonthly.toFixed(2)}</p>
+    `;
+  }
+  </script>
+
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title></title>
+<style type="text/css">.calculator {
+      background: #3b72cb;;
+      padding: 25px 35px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      max-width: 450px;
+      width: 100%;
+      margin-bottom: 40px;
+    }
+.cal-body{
+
+          margin: 0;
+          background-size: 200px 150px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+        padding: 30px 15px;
+
+
+}
+    h2 {
+      text-align: center;
+      color: #fff;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+         color: #fff;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      margin-bottom: 15px;
+    }
+      .error-box {
+    background: #dc2626;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: 500;
+  }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #10b981;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #059669;
+    }
+
+    .results {
+      margin-top: 20px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .results p {
+      margin: 8px 0;
+    }
+
+    .body-section {
+      background: #3b72cb;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      max-width: 800px;
+      width: 100%;
+      margin-bottom: 40px;
+    }
+
+    .body-section h2 {
+      text-align: center;
+      color: #10b981;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      color: #fff;
+    }
+
+    th, td {
+      border: 1px solid #334155;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background: #0f172a;
+    }
+
+    tr:nth-child(even) {
+      background: #334155;
+    }
+
+    .info-box {
+      background: #334155;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+      color: #e2e8f0;
+    }
+
+    @media (max-width: 500px) {
+      .calculator, section {
+        padding: 20px;
+      }
+      h2 {
+        font-size: 1.3rem;
+      }
+    }
+</style>
+<div class="cal-body">
+<div class="calculator">
+<h2><img src="" />National Minimum Wage Calculator</h2>
+
+<div class="error-box" id="errorBox" style="display: none;">&nbsp;</div>
+<label>Hourly Rate (N$)</label> <input id="hourlyRate" min="0" placeholder="Enter hourly rate" type="number" /> <label>Hours Worked per Day</label> <input id="hoursPerDay" max="24" min="1" placeholder="e.g. 8" type="number" /> <label>Work Days per Week</label> <input id="daysPerWeek" max="7" min="1" placeholder="e.g. 5" type="number" /> <label>Overtime Hours (per week)</label> <input id="overtimeHours" min="0" placeholder="e.g. 3" type="number" /> <label>Sundays/Public Holidays Worked</label> <input id="sundayHours" min="0" placeholder="e.g. 4" type="number" /><button onclick="calculateWage()">Calculate</button>
+
+<div class="results" id="results">&nbsp;</div>
+</div>
+</div>

@@ -20,7 +20,9 @@ class ExemptionVariation extends Model implements HasMedia
         'position',
         'application_date',
             'status',
-    'approved_document'
+    'approved_document',
+    'reviewer_comments',
+    'minister_comments',
     ];
     protected $casts = [
     'application_date' => 'date',
