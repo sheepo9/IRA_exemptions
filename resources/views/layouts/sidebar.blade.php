@@ -76,6 +76,9 @@
         <ul class="list-group list-group-flush">
           <li class="list-group-item"><a href="{{ route('exemption_variations.index') }}" class="text-decoration-none">View Records</a></li>
           <li class="list-group-item"><a href="{{ route('exemption_variations.create') }}" class="text-decoration-none">Add New</a></li>
+        <li class="list-group-item"><a href="{{ route('exemption-variation.declaration') }}" class="text-decoration-none">Make Declaration</a></li>
+        </a>
+        
         </ul>
       </div>
  @role('Administrator')

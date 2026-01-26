@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\ExemptionApplication;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Section;
+use App\Http\Controllers\Log;
 
 class ExemptionApplicationController extends Controller
 {
@@ -24,7 +26,8 @@ class ExemptionApplicationController extends Controller
 
     public function create()
     {
-        return view('exemption_applications.create');
+        $sections = Section::orderBy('section_name')->get();
+        return view('exemption_applications.create', compact('sections'));
     }
 
     public function store(Request $request)
@@ -54,6 +57,10 @@ class ExemptionApplicationController extends Controller
                          ->with('success', 'Exemption application submitted successfully.');
     }
 
+
+
+
+    
     public function show(ExemptionApplication $exemptionApplication)
     {
         return view('exemption_applications.show', compact('exemptionApplication'));

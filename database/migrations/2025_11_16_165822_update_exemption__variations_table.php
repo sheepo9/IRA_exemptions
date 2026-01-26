@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('exemption__variations', function (Blueprint $table) {
+        Schema::table('exemption_variations', function (Blueprint $table) {
             $table->string('status')->default('Pending');
         $table->string('approved_document')->nullable();
         });
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('exemption__variations', function (Blueprint $table) {
+        Schema::table('exemption_variations', function (Blueprint $table) {
             //
         });
     }

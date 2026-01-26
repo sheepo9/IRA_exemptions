@@ -16,6 +16,9 @@
     @endif
 
     <a href="{{ route('exemption_variations.create') }}" class="btn btn-primary mb-3">New Application</a>
+<a href="{{ route('exemption_variations.reviewed') }}" class="btn btn-primary mb-3">View Reviewed Application </a>
+<a href="{{ route('exemption_variations.completed') }}" class="btn btn-primary mb-3">View Completed Declarations</a>
+<a href="{{ url()->previous() }}" class="btn btn-secondary mb-3">   Back</a>
 
     <table class="table table-bordered">
         <thead>
@@ -24,13 +27,10 @@
                 <th>Address</th>
                 <th>Representative</th>
                 <th>Date</th>
-                <th>Status</th>
+                <th>Status</th>                  
+                <th>Actions</th>
+                 <th> User Comments</th>
                            
-                            <th>Actions</th>
-                            <th>Download</th>
-                             @role('Administrator')
-                                        <th>Approve</th>
-                                    @endrole
             </tr>
         </thead>
         <tbody>
@@ -41,45 +41,32 @@
                     <td>{{ $app->representative_name }}</td>
                     <td>{{ $app->application_date }}</td>
                     <td>{{ $app->status }}</td>
+                    
                     <td>
-                        <a href="{{ route('exemption_variations.show', $app->id) }}" class="btn btn-info btn-sm">View</a>
-                        <a href="{{ route('exemption_variations.edit', $app->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                        <form action="{{ route('exemption_variations.destroy', $app->id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button onclick="return confirm('Delete this record?')" class="btn btn-danger btn-sm">Delete</button>
-                        </form>
+                        <a href="{{ route('exemption_variations.show', $app->id) }}" class="btn btn-info btn-sm">Review</a>
                     </td>
-                      <td>
-                                @if(Auth::user()->hasRole('Administrator'))
-                                    {{-- Admin downloads the original application PDF --}}
-                                    <a href="{{ route('Exemption_Declarations.pdf', $app->id) }}" class="btn btn-primary">
-                                        Download Application PDF
-                                    </a>
-                                @else
-                                    {{-- Normal user downloads the approved document --}}
-                                    @if($app->approved_document)
-                                        <a href="{{ route('Exemption_Declarations.download', $app->id) }}" 
-                                        class="btn btn-outline-primary">
-                                            Download Approved Document
-                                        </a>
-                                    @else
-                                        <span class="text-muted">Not available</span>
-                                    @endif
-                                @endif
-                                            @role('Administrator')                                                                          
-                                <td>
-                                    <a href="{{ route('Exemption_Declarations.approve', $app->id) }}" 
-                                           class="btn btn-warning">Approve</a>
-                                    </td>@endrole
-                </tr>
+                    <td> @if(!empty($app->reviewer_comments))
+        <div class="text-muted">
+            {{ $app->reviewer_comments }}
+        </div>
+    @else
+        <div class="text-muted fst-italic">
+            No comment yet
+        </div>
+    @endif </td>
+
             @empty
-                <tr><td colspan="5" class="text-center">No applications found.</td></tr>
+                <tr><td colspan="5" class="text-center">No applications found.</td>
+            
+            </tr>
             @endforelse
         </tbody>
     </table>
+<a href="{{ url()->previous() }}" class="btn btn-secondary">
+    Back
+</a>
 
-    {{ $applications->links() }}
+
 </div>
 </div>
 </div>

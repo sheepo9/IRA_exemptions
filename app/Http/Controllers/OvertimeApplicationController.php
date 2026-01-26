@@ -52,12 +52,20 @@ class OvertimeApplicationController extends Controller
             'proposed_weekly_limit' => 'nullable|string',
             'work_on_sundays' => 'nullable|boolean',
             'class_of_employees' => 'nullable|string',
-            'employee_consent_link' => 'nullable|string',
-            'period_sought' => 'nullable|string',
+                        'period_sought' => 'nullable|string',
             'signature_date' => 'nullable|date',
+              'employee_consent_document' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
         ]);
 
-        OvertimeApplication::create($validated);
+       $application = OvertimeApplication::create($validated);
+
+    // ✅ Spatie Media Upload
+    if ($request->hasFile('employee_consent_document')) {
+        $application
+            ->addMediaFromRequest('employee_consent_document')
+            ->toMediaCollection('employee_consent');
+    }
+
 
         return redirect()->route('overtime-applications.index')
                          ->with('success', 'Overtime application submitted successfully.');
@@ -98,14 +106,23 @@ class OvertimeApplicationController extends Controller
             'employee_consent_link' => 'nullable|string',
             'period_sought' => 'nullable|string',
             'signature_date' => 'nullable|date',
+            'employee_consent_document' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+
         ]);
 
-        $overtimeApplication->update($validated);
+        
+                $overtimeApplication->update($validated);
+
+                // ✅ Replace existing consent document (singleFile())
+                if ($request->hasFile('employee_consent_document')) {
+                    $overtimeApplication
+                        ->addMediaFromRequest('employee_consent_document')
+                        ->toMediaCollection('employee_consent');
 
         return redirect()->route('overtime-applications.index')
                          ->with('success', 'Overtime application updated successfully.');
     }
-
+    }
     /**
      * Remove the specified resource from storage.
      */
