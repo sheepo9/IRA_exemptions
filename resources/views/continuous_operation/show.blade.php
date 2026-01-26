@@ -167,9 +167,24 @@
                 </div>
 
 
+               <!-- Timestamps -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <small class="text-muted">
+                            Created: {{ $application->created_at->format('M d, Y H:i') }} |
+                            Last Updated: {{ $application->updated_at->format('M d, Y H:i') }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
-<@role('Staff')
+
+
+
+@role('Staff')
 <hr>
 <h5>Staff Member Comment</h5>
 
@@ -197,13 +212,6 @@
     </div>
 @endif
 @endrole
-
-
-    </div>
-
-
-    </button>
-</form>
 
 
 
@@ -266,74 +274,16 @@
 </div>
                 </div>
 
-               <!-- Timestamps -->
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <small class="text-muted">
-                            Created: {{ $application->created_at->format('M d, Y H:i') }} |
-                            Last Updated: {{ $application->updated_at->format('M d, Y H:i') }}
-                        </small>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <hr>
-
-<h5>Status</h5>
-
-<span class="badge bg-{{ $application->status === 'Approved' ? 'success' : 'warning' }}">
-    {{ $application->status }}
-</span>
-
-<hr>
-
-@role('Administrator')
-    <h5>Approval</h5>
-
-    @if($application->status !== 'Approved')
-        <form action="{{ route('operations.approve', $application->id) }}"
-              method="POST"
-              enctype="multipart/form-data"
-              class="mt-3">
-            @csrf
-
-            <div class="mb-2">
-                <label class="form-label">Approved Document</label>
-                <input type="file"
-                       name="approved_document"
-                       class="form-control"
-                       accept=".pdf,.doc,.docx"
-                       required>
-            </div>
-
-            <button class="btn btn-success">
-                Approve Application
-            </button>
-        </form>
-    @else
-        <p class="text-success fw-bold mt-2">
-            This application is approved.
-        </p>
-    @endif
-@endrole
 
 
-       <div
-
-
-            </div>
-
-            <div
-
-                                <tr>
+                              <tr>
 
                                     @role('Administrator')
 
                                     @endrole
 
                                 </tr>
+
                             </thead>
                             <tbody>
                                 @foreach($applications as $app)
@@ -381,49 +331,11 @@
         {{-- table head + body --}}
     </table>
 
-                        {{-- Pagination --}}
-                        <div class="d-flex justify-content-center mt-3">
-                               {{ $applications->links() }}
-                        </div>
-                    @else
-                        <p class="text-center text-muted mb-0">No pending applications found.</p>
                     @endif
                 </div>
             </div>
         </div>
-          <!--  <tbody>
-    <tr>
-        <td>{{ $application->email }}</td>
-        <td>{{ $application->period }}</td>
-        <td>
-            <span class="badge bg-{{ $application->status == 'Approved' ? 'success' : 'warning' }}">
-                {{ $application->status }}
-            </span>
-        </td>
-        <td>
-            @if($application->approved_document)
-                <a href="{{ route('operations.download', $application->id) }}" class="btn btn-sm btn-primary">
-                    Download
-                </a>
-            @else
-                <span class="text-muted">Not available</span>
-            @endif
-        </td>
-        @role('Administrator')
-            <td>
-                @if($application->status !== 'Approved')
-                    <form action="{{ route('operations.approve', $application->id) }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <input type="file" name="approved_document" class="form-control mb-2" accept=".pdf,.doc,.docx">
-                        <button class="btn btn-success btn-sm">Approve</button>
-                    </form>
-                @else
-                    <span class="text-success">Approved</span>
-                @endif
-            </td>
-        @endrole
-    </tr>
-</tbody>
+
 
 
 </div>

@@ -267,21 +267,32 @@ public function showApprovalForm($id)
     return view('continuous_operation.showApprovalForm', compact('application'));
 }
 
-public function storeStaffComment(Request $request, $application)
+public function storeComment(Request $request, $applicationId)
+{
+    $request->validate([
+        'comment' => 'required|string',
+    ]);
+
+    $application = Application::findOrFail($applicationId);
+
+    $application->comment = $request->comment;
+    $application->save();
+
+    return back()->with('success', 'Comment added');
+}
+
+public function saveStaffComment(Request $request, ContinuousOperation $application)
 {
     $request->validate([
         'staff_member_comment' => 'required|string',
     ]);
 
-    $application = Continuous_operation::findOrFail($application);
-
     $application->staff_member_comment = $request->staff_member_comment;
     $application->save();
 
-    return redirect()
-        ->back()
-        ->with('success', 'Comment saved successfully.');
+    return back()->with('success', 'Comment saved successfully.');
 }
+
 
 
 public function downloadpdf($id)

@@ -153,14 +153,11 @@ Route::get(
     [ContinuousOperationController::class, 'previewShiftRoster']
 )->name('operations.shiftRoster.preview');
 });
-Route::get(
-    '/operations/{application}/comments',
-    [OperationCommentController::class, 'store']
-)->name('operations.comments.store');
-
 Route::middleware(['auth'])->group(function () {
-Route::get(
-    '/operations/{application}/staff-comment',
-    [ContinuousOperationController::class, 'saveStaffComment']
-)->name('operations.staff.comment');
+    Route::post(
+        '/operations/{application}/staff-comment',
+        [ContinuousOperationController::class, 'saveStaffComment']
+    )->name('operations.staff.comment');
 });
+
+

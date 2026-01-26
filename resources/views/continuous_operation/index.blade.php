@@ -34,6 +34,7 @@
                             <th>Download</th>
                              @role('Administrator')
                                         <th>Approve</th>
+
                                     @endrole
                         </tr>
                     </thead>
@@ -76,7 +77,8 @@
                                         <span class="text-muted">Not available</span>
                                     @endif
                                 @endif
-                                            @role('Administrator')
+
+                                 @role('Administrator')
                                 <td>
                                     <a href="{{ route('operations.show', $application->id) }}"
                                            class="btn btn-info">View</a>
