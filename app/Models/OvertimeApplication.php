@@ -25,7 +25,13 @@ class OvertimeApplication extends Model implements HasMedia
         'period_sought',
         'signature_date',
          'status',
-    'approved_document'
+    'approved_document',
+    'user_id',
+    'staff_comment',
+    'DD_comment',
+    'DED_comment',
+    'ED_comment',
+    'user_status',
 
     ];
     public function registerMediaCollections(): void

@@ -19,6 +19,13 @@
 <a href="{{ route('exemption_variations.reviewed') }}" class="btn btn-primary mb-3">View Reviewed Application </a>
 <a href="{{ route('exemption_variations.completed') }}" class="btn btn-primary mb-3">View Completed Declarations</a>
 <a href="{{ url()->previous() }}" class="btn btn-secondary mb-3">   Back</a>
+@foreach(auth()->user()->unreadNotifications as $notification)
+    <div class="alert alert-info">
+        <strong>{{ $notification->data['message'] }}</strong><br>
+        Applicant: {{ $notification->data['applicant_name'] }}<br>
+        <a href="{{ $notification->data['url'] }}">View Application</a>
+    </div>
+@endforeach
 
     <table class="table table-bordered">
         <thead>

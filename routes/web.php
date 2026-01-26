@@ -92,6 +92,10 @@ Route::get('/Overtime_Applications/{id}/approve', [OvertimeApplicationController
     Route::get('Overtime_Applications/{id}/pdf', [OvertimeApplicationController::class, 'downloadPdf'])
         ->name('Overtime_Applications.pdf');
 
+Route::put(
+    '/overtime-applications/{overtimeApplication}/review',
+    [OvertimeApplicationController::class, 'review']
+)->name('overtime-applications.review');
 
 //_--------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------

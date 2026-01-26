@@ -8,6 +8,9 @@ use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Section;
+use App\Models\User;
+use App\Notifications\MinisterCommentedNotification;
+
 class ExemptionVariationController extends Controller
 {
     public function __construct()
@@ -206,7 +209,11 @@ public function ministerDecision(Request $request, ExemptionVariation $exemption
         'minister_comments' => $request->minister_comments,
         //'status' => $request->status,
     ]);
-
+   // Notify all Administrators
+    $administrators = User::role('Administrator')->get();
+     foreach ($administrators as $admin) {
+        $admin->notify(new MinisterCommentedNotification($exemption_variation));
+    }
     return redirect()
         ->route('exemption_variations.completed')
         ->with('success', 'Minister comment recorded successfully.');

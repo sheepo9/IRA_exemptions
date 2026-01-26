@@ -6,7 +6,13 @@
         <div class="col-md-3">
             @include('layouts.sidebar')
         </div>
-
+@foreach(auth()->user()->unreadNotifications as $notification)
+    <div class="alert alert-info">
+        <strong>{{ $notification->data['message'] }}</strong><br>
+        Applicant: {{ $notification->data['applicant_name'] }}<br>
+        <a href="{{ $notification->data['url'] }}">View Application</a>
+    </div>
+@endforeach
         <div class="col-md-9">
             <h2 class="mb-3">Reviewed Applications</h2>
 

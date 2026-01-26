@@ -124,6 +124,66 @@
         </div>
     </div>
 
+
+
+@hasanyrole('Administrator|Deputy_Director|Deputy_Executive_Director|Executive_Director')
+<hr class="my-4">
+<h6 class="fw-bold text-uppercase border-bottom pb-2 mb-3">
+    Internal Review & Comments
+</h6>
+
+<form action="{{ route('overtime-applications.review', $overtimeApplication->id) }}" method="POST">
+    @csrf
+    @method('PUT')
+
+    @role('Administrator')
+        <div class="mb-3">
+            <label class="fw-bold">Staff Comment</label>
+            <textarea name="staff_comment" class="form-control" rows="3" placeholder="Enter staff comment">{{ old('staff_comment', $overtimeApplication->staff_comment) }}</textarea>
+        </div>
+        <div class="text-end mt-2">
+            <button type="submit" name="action" value="staff_approve" class="btn btn-success">Approve & Forward to DD</button>
+            <button type="submit" name="action" value="staff_reject" class="btn btn-danger">Reject</button>
+        </div>
+    @endrole
+
+    @role('Deputy_Director')
+        <div class="mb-3">
+            <label class="fw-bold">DD Comment</label>
+            <textarea name="dd_comment" class="form-control" rows="3" placeholder="Enter DD comment">{{ old('dd_comment', $overtimeApplication->dd_comment) }}</textarea>
+        </div>
+        <div class="text-end mt-2">
+            <button type="submit" name="action" value="dd_approve" class="btn btn-success">Approve & Forward to DED</button>
+            <button type="submit" name="action" value="dd_reject" class="btn btn-danger">Reject</button>
+        </div>
+    @endrole
+
+   @role('Deputy_Executive_Director')
+        <div class="mb-3">
+            <label class="fw-bold">DED Comment</label>
+            <textarea name="ded_comment" class="form-control" rows="3" placeholder="Enter DED comment">{{ old('ded_comment', $overtimeApplication->ded_comment) }}</textarea>
+        </div>
+        <div class="text-end mt-2">
+            <button type="submit" name="action" value="ded_approve" class="btn btn-success">Approve & Forward to ED</button>
+            <button type="submit" name="action" value="ded_reject" class="btn btn-danger">Reject</button>
+        </div>
+   @endrole
+
+    @role('Executive_Director')
+        <div class="mb-3">
+            <label class="fw-bold">ED Comment</label>
+            <textarea name="ed_comment" class="form-control" rows="3" placeholder="Enter ED comment">{{ old('ed_comment', $overtimeApplication->ed_comment) }}</textarea>
+        </div>
+        <div class="text-end mt-2">
+            <button type="submit" name="action" value="ed_approve" class="btn btn-success">Approve (Final)</button>
+            <button type="submit" name="action" value="ed_reject" class="btn btn-danger">Reject (Final)</button>
+        </div>
+  @endrole
+</form>
+@endhasanyrole
+
+
+
     {{-- Footer --}}
     <div class="text-center mt-4">
         <a href="{{ route('overtime-applications.index') }}" class="btn btn-secondary">

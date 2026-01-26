@@ -10,7 +10,7 @@
 <div class="container mt-4">
     <h2>Edit Overtime Application</h2>
 
-    <form action="{{ route('overtime-applications.update', $overtimeApplication->id) }}" method="POST">
+    <form action="{{ route('overtime-applications.update', $overtimeApplication->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -71,10 +71,14 @@
             <textarea name="class_of_employees" class="form-control" rows="2">{{ $overtimeApplication->class_of_employees }}</textarea>
         </div>
 
-        <div class="mb-3">
-            <label>Employee Consent Link</label>
-            <input type="url" name="employee_consent_link" class="form-control" value="{{ $overtimeApplication->employee_consent_link }}">
-        </div>
+        <!-- ✅ Employee Consent Upload -->
+                <div class="mb-3">
+                    <label>Employee Consent Document</label>
+                    <input type="file" 
+                           name="employee_consent_document" 
+                           class="form-control"
+                           accept=".pdf,.doc,.docx,.jpg,.png">
+                </div>
 
         <div class="mb-3">
             <label>Period Sought</label>

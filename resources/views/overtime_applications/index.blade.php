@@ -15,19 +15,47 @@
     @endif
 
     <a href="{{ route('overtime-applications.create') }}" class="btn btn-primary mb-3">+ New Application</a>
+   @role('Administrator')
+    <a href="{{ route('overtime-applications.index', ['status' => 'rejected_by_staff']) }}"
+       class="btn btn-primary mb-3">Rejected Applications</a>
+@endrole
+ @role('Administrator')
+    <a href="{{ route('overtime-applications.index', ['status' => 'approved_by_ed']) }}"
+       class="btn btn-primary mb-3">Approved Applications</a>
+@endrole
+
+@role('Deputy_Director')
+    <a href="{{ route('overtime-applications.index', ['status' => 'reviewed_by_staff']) }}"
+       class="btn btn-warning mb-3">Pending Applications</a>
+@endrole
+
+@role('Executive_Director')
+    <a href="{{ route('overtime-applications.index', ['status' => 'rejected_by_ded']) }}"
+       class="btn btn-danger mb-3">Rejected Applications</a>
+@endrole
 
     <table class="table table-bordered table-striped">
-        <thead class="table-dark">
+        <thead class="table-secondary">
             <tr>
                 <th>ID</th>
                 <th>Employer</th>
                 <th>Contact Person</th>
-                 <th>Status</th>
-                      
-            <th>Actions</th>
-                            <th>Download</th>
-                             @role('Administrator')
-                                        <th>Approve</th>
+                @role('User') <th>Status</th>
+                @endrole
+                 @role('Administrator|Deputy_Director|Deputy_Executive_Director')
+                   <th>Internal Status</th>
+                 @endrole
+                 @role('User|Administrator|Deputy_Director|Deputy_Executive_Director')
+                 <th>Comment </th>   
+                 @endrole
+                                     @role('User')
+                                       <th>Actions</th>
+                                       <th>Download</th> 
+
+                                    @endrole
+                        
+                             @role('Administrator|Deputy_Director|Deputy_Executive_Director|Executive_Director')
+                                        <th>Review</th>
                                     @endrole
             </tr>
         </thead>
@@ -37,25 +65,72 @@
                 <td>{{ $app->id }}</td>
                 <td>{{ $app->employer_name }}</td>
                 <td>{{ $app->contact_person }}</td>
-                 <td>{{ $app->status }}</td>
-                <td>
-                    <a href="{{ route('overtime-applications.show', $app->id) }}" class="btn btn-info btn-sm">View</a>
-                    <a href="{{ route('overtime-applications.edit', $app->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                @role('User') 
+                 <td>{{ $app->user_status }}</td>
+             @endrole
+                    @role('Administrator|Deputy_Director|Deputy_Executive_Director')
+                    <td>{{ $app->status }}</td>
+                    @endrole
+                 <td>
+                    @role('User')
+                    @if(!empty($app->staff_comment))
+                        <div class="text-muted">
+                            {{ $app->staff_comment}}
+                        </div>
+                     @else
+                            <div class="text-muted fst-italic">
+                                No comment yet
+                            </div>
+                        @endif
+                    @endrole
+                     @role('Administrator')
+                    @if(!empty($app->staff_comment))
+                        <div class="text-muted">
+                            {{ $app->DD_comment}}
+                        </div>
+                     @else
+                            <div class="text-muted fst-italic">
+                                No comment yet
+                            </div>
+                        @endif
+                    @endrole
+                     @role('Deputy_Director')
+                    @if(!empty($app->staff_comment))
+                        <div class="text-muted">
+                            {{ $app->DED_comment }}
+                        </div>
+                     @else
+                            <div class="text-muted fst-italic">
+                                No comment yet
+                            </div>
+                        @endif
+                    @endrole
+                     @role('Deputy_Executive_Director')
+                    @if(!empty($app->staff_comment))
+                        <div class="text-muted">
+                            {{ $app->ED_comment }}
+                        </div>
+                     @else
+                            <div class="text-muted fst-italic">
+                                No comment yet
+                            </div>
+                        @endif
+                    @endrole
+                     
+  </td>
+                                @role('User')
+                                <td>
+                                    <a href="{{ route('overtime-applications.show', $app->id) }}" class="btn btn-info btn-sm">View</a>
+                                    <a href="{{ route('overtime-applications.edit', $app->id) }}" class="btn btn-warning btn-sm">Edit</a>
 
-                    <form action="{{ route('overtime-applications.destroy', $app->id) }}" method="POST" class="d-inline">
-                        @csrf
-                        @method('DELETE')
-                        <button class="btn btn-danger btn-sm" onclick="return confirm('Delete this record?')">Delete</button>
-                    </form>
-                </td>
-                <td>
-                     @if(Auth::user()->hasRole('Administrator'))
-                                    {{-- Admin downloads the original application PDF --}}
-                                    <a href="{{ route('Overtime_Applications.pdf', $app->id) }}" class="btn btn-primary">
-                                        Download Application PDF
-                                    </a>
-                                @else
-                                    {{-- Normal user downloads the approved document --}}
+                                    <form action="{{ route('overtime-applications.destroy', $app->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-danger btn-sm" onclick="return confirm('Delete this record?')">Delete</button>
+                                    </form>
+                                </td> @endrole
+                                    @role('User') <td>
+                                                    {{-- Normal user downloads the approved document --}}
                                     @if($app->approved_document)
                                         <a href="{{ route('Overtime_Applications.download', $app->id) }}" 
                                         class="btn btn-outline-primary">
@@ -64,12 +139,41 @@
                                     @else
                                         <span class="text-muted">Not available</span>
                                     @endif
-                                @endif
+                               @endrole </td>
+
+                                 
+                                    <td>
+                                @role('Deputy_Director')
+                                    @if($app->status === 'rejected_by_ded' || $app->status === 'reviewed_by_staff')
+                                        <a href="{{ route('overtime-applications.show', $app->id) }}" class="btn btn-warning btn-sm">
+                                            Review
+                                        </a>
+                                    @endif
+                                @endrole
+                                   
+                                     
+                                    @role('Deputy_Executive_Director')
+                                        @if($app->status === 'approved_by_dd'|| $app->status === 'rejected_by_ed')
+                                            <a href="{{ route('overtime-applications.show', $app->id) }}" class="btn btn-warning btn-sm">
+                                                Review
+                                            </a>
+                                        @endif
+                                    @endrole
+                                        
+                                    @role('Executive_Director')
+                                        @if($app->status === 'approved_by_ded')
+                                            <a href="{{ route('overtime-applications.show', $app->id) }}" class="btn btn-warning btn-sm">
+                                                Review
+                                            </a>
+                                        @endif
+                                    @endrole 
+                             
                                             @role('Administrator')                                                                          
-                                <td>
-                                    <a href="{{ route('Overtime_Applications.approve', $app->id) }}" 
-                                           class="btn btn-warning">Approve</a>
-                                    </td>@endrole
+                               
+                                    <a href="{{  route('overtime-applications.show', $app->id) }}" 
+                                           class="btn btn-warning">Review</a>
+                                    @endrole
+                                </td>
             </tr>
             @empty
             <tr><td colspan="7" class="text-center">No applications found.</td></tr>
