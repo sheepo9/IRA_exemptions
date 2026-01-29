@@ -8,6 +8,8 @@ use Spatie\Permission\Models\Permission;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Response;
+
 
 class OvertimeApplicationController extends Controller
 {
@@ -290,7 +292,7 @@ public function review(Request $request, OvertimeApplication $overtimeApplicatio
             ]);
             break;
 
-        // ===== Executive Director =====
+        /* ===== Executive Director =====
         case 'ed_approve':
             $request->validate(['ed_comment' => 'nullable|string']);
             $overtimeApplication->update([
@@ -299,13 +301,47 @@ public function review(Request $request, OvertimeApplication $overtimeApplicatio
                 'user_status' => 'approved', // final
             ]);
             break;
-
+*/
         case 'ed_reject':
             $request->validate(['ed_comment' => 'nullable|string']);
             $overtimeApplication->update([
                 'ed_comment' => $request->ed_comment,
                 'status' => 'rejected_by_ed', // final
             ]);
+            break;
+        case 'ed_approve':
+       case 'ed_reject':
+            // Validate both comment and optional file
+            //dd('controller reached');
+
+            $request->validate([
+                'ed_comment' => 'nullable|string',
+                'ed_file' => 'nullable|file|mimes:pdf,doc,docx|max:5120', // max 5MB
+            ]);
+
+            // Update comment and status
+            $overtimeApplication->update([
+                'ed_comment' => $request->ed_comment,
+                'status' => $request->action === 'ed_approve' ? 'approved_by_ed' : 'rejected_by_ed',
+                 'user_status' => 'approved', // final
+            ]);
+
+           if ($request->hasFile('ed_file')) {
+
+            Log::info('ED file detected');
+                Log::info('ED file upload', [
+                    'file' => $request->file('ed_file'),
+                ]);
+
+                    // Remove old ED file if exists
+                    $overtimeApplication->clearMediaCollection('ed_files');
+
+                    // Add new ED file to 'ed_files' collection
+                    $overtimeApplication
+                        ->addMediaFromRequest('ed_file')
+                        ->toMediaCollection('ed_files', 'public'); // optional: use public disk for public access
+                }
+
             break;
 
         default:
@@ -316,8 +352,39 @@ public function review(Request $request, OvertimeApplication $overtimeApplicatio
                  ->with('success', 'Application updated successfully!');
 
 }
+public function downloadDEDFile($id)
+{
+    $application = OvertimeApplication::findOrFail($id);
 
+    $media = $application->getFirstMedia('ed_files');
 
+    if (!$media) {
+        return back()->with('error', 'No DED document found.');
+    }
+
+    return response()->download(
+        $media->getPath(),
+        'DED_' . $application->employer_name . '.' . $media->extension // adjust as needed
+    );
+}
+public function previewDEDFile($id)
+{
+    $application = OvertimeApplication::findOrFail($id);
+
+    $media = $application->getFirstMedia('ed_files');
+
+    if (!$media) {
+        abort(404, 'DED document not found.');
+    }
+
+    return response()->file(
+        $media->getPath(),
+        [
+            'Content-Type' => $media->mime_type, // automatically detect MIME type
+            'Content-Disposition' => 'inline; filename="' . $media->file_name . '"',
+        ]
+    );
+}
 
 
 }

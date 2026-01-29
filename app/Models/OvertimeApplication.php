@@ -38,5 +38,7 @@ class OvertimeApplication extends Model implements HasMedia
     {
         $this->addMediaCollection('employee_consent')
              ->singleFile(); // only ONE consent document
+        
+          $this->addMediaCollection('ed_files')->singleFile(); // single file only
     }
 }

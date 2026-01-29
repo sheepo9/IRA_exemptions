@@ -9,15 +9,27 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // 1. Add column (no FK yet)
         Schema::table('overtime_applications', function (Blueprint $table) {
-            $table->foreignId('user_id')->nullable()->after('id');
+            $table->unsignedBigInteger('user_id')->nullable()->after('id');
         });
 
-        // Assign existing records to admin (or system user)
-        DB::table('overtime_applications')
-            ->whereNull('user_id')
-            ->update(['user_id' => 3]); // make sure user ID 3 exists
+        // 2. Get a safe fallback user (admin / first user)
+        $fallbackUserId = DB::table('users')->orderBy('id')->value('id');
 
+        if (!$fallbackUserId) {
+            throw new Exception('No users found. Cannot assign overtime_applications.user_id');
+        }
+
+        // 3. Fix ALL invalid user references
+        DB::statement("
+            UPDATE overtime_applications
+            SET user_id = {$fallbackUserId}
+            WHERE user_id IS NULL
+               OR user_id NOT IN (SELECT id FROM users)
+        ");
+
+        // 4. Add FK constraint
         Schema::table('overtime_applications', function (Blueprint $table) {
             $table->foreign('user_id')
                   ->references('id')

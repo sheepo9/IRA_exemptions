@@ -132,7 +132,7 @@
     Internal Review & Comments
 </h6>
 
-<form action="{{ route('overtime-applications.review', $overtimeApplication->id) }}" method="POST">
+<form action="{{ route('overtime-applications.review', $overtimeApplication->id) }}" method="POST"  enctype="multipart/form-data">>
     @csrf
     @method('PUT')
 
@@ -163,6 +163,8 @@
             <label class="fw-bold">DED Comment</label>
             <textarea name="ded_comment" class="form-control" rows="3" placeholder="Enter DED comment">{{ old('ded_comment', $overtimeApplication->ded_comment) }}</textarea>
         </div>
+         <!-- File upload -->
+  
         <div class="text-end mt-2">
             <button type="submit" name="action" value="ded_approve" class="btn btn-success">Approve & Forward to ED</button>
             <button type="submit" name="action" value="ded_reject" class="btn btn-danger">Reject</button>
@@ -174,6 +176,15 @@
             <label class="fw-bold">ED Comment</label>
             <textarea name="ed_comment" class="form-control" rows="3" placeholder="Enter ED comment">{{ old('ed_comment', $overtimeApplication->ed_comment) }}</textarea>
         </div>
+          <div class="mb-3">
+        <label class="fw-bold">Upload Approved Document
+
+        </label>
+        <input type="file" name="ed_file" class="form-control">
+        @if($overtimeApplication->getFirstMediaUrl('ed_files'))
+            <small>Current file: <a href="{{ $overtimeApplication->getFirstMediaUrl('ed_files') }}" target="_blank">View</a></small>
+        @endif
+    </div>
         <div class="text-end mt-2">
             <button type="submit" name="action" value="ed_approve" class="btn btn-success">Approve (Final)</button>
             <button type="submit" name="action" value="ed_reject" class="btn btn-danger">Reject (Final)</button>

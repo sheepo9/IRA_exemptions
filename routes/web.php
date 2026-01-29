@@ -97,7 +97,12 @@ Route::put(
     [OvertimeApplicationController::class, 'review']
 )->name('overtime-applications.review');
 
-//_--------------------------------------------------------------------------------------------------
+Route::get('overtime-applications/{id}/ded-download', [OvertimeApplicationController::class, 'downloadDEDFile'])
+     ->name('overtime-applications.ded-download');
+
+Route::get('overtime-applications/{id}/ded-preview', [OvertimeApplicationController::class, 'previewDEDFile'])
+     ->name('overtime-applications.ded-preview');
+
 //---------------------------------------------------------------------------------------------------
 //-------------------------------------wager Applications ---------------------------------------
 // custom routes

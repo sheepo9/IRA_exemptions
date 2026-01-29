@@ -130,15 +130,24 @@
                                     </form>
                                 </td> @endrole
                                     @role('User') <td>
-                                                    {{-- Normal user downloads the approved document --}}
-                                    @if($app->approved_document)
-                                        <a href="{{ route('Overtime_Applications.download', $app->id) }}" 
-                                        class="btn btn-outline-primary">
-                                            Download Approved Document
-                                        </a>
-                                    @else
-                                        <span class="text-muted">Not available</span>
-                                    @endif
+                                   <div class="mb-3">
+  
+    <!-- Display DED file links if exists -->
+    @if( $app->getFirstMediaUrl('ed_files'))
+        <div class="mb-1">
+          
+            <a href="{{ route('overtime-applications.ded-download',  $app->id) }}" target="_blank">
+                Download
+            </a> | 
+            <a href="{{ route('overtime-applications.ded-preview',  $app->id) }}" target="_blank">
+                Preview
+            </a>
+        </div>
+    @else
+        <span class="text-muted">No approved document attached yet.</span>
+    @endif
+
+
                                @endrole </td>
 
                                  
