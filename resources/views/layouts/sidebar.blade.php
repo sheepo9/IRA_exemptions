@@ -46,7 +46,7 @@
         </ul>
       </div>
 
-      <!-- Exemption Applications -->
+      <!-- Exemption Applications 
       <div class="card mb-3 shadow-sm">
         <div class="card-header bg-info text-white">
           Exemption Applications (Form LM 1)
@@ -55,9 +55,9 @@
           <li class="list-group-item"><a href="{{ route('exemption-applications.index') }}" class="text-decoration-none">View Applications</a></li>
           <li class="list-group-item"><a href="{{ route('exemption-applications.create') }}" class="text-decoration-none">New Application</a></li>
         </ul>
-      </div>
+      </div>-->
 
-      <!-- Exemption Wager -->
+      <!-- Exemption Wager 
       <div class="card mb-3 shadow-sm">
         <div class="card-header bg-warning text-white">
           Exemption Wagers (Form LM 1)
@@ -66,7 +66,7 @@
           <li class="list-group-item"><a href="{{ route('exemption_wagers.index') }}" class="text-decoration-none">View Records</a></li>
           <li class="list-group-item"><a href="{{ route('exemption_wagers.create') }}" class="text-decoration-none">Add New</a></li>
         </ul>
-      </div>
+      </div>-->
 
       <!-- Exemption Variations -->
       <div class="card mb-3 shadow-sm">
@@ -76,9 +76,9 @@
         <ul class="list-group list-group-flush">
           <li class="list-group-item"><a href="{{ route('exemption_variations.index') }}" class="text-decoration-none">View Records</a></li>
           <li class="list-group-item"><a href="{{ route('exemption_variations.create') }}" class="text-decoration-none">Add New</a></li>
-        <li class="list-group-item"><a href="{{ route('exemption-variation.declaration') }}" class="text-decoration-none">Make Declaration</a></li>
+         @role('Administrator')<li class="list-group-item"><a href="{{ route('exemption-variation.declaration') }}" class="text-decoration-none">Make Declaration</a></li>
         </a>
-        
+         @endrole
         </ul>
       </div>
  @role('Administrator')

@@ -70,6 +70,20 @@ if ($user->hasRole('Administrator')) {
     return view('overtime_applications.index', compact('applications'));
 }
 
+public function applications(Request $request)
+{
+    $status = $request->query('status');          // e.g., pending
+    $user_status = $request->query('user_status'); // e.g., approved, rejected
+
+    $applications = OvertimeApplication::query()
+        ->when($status, fn($q) => $q->where('status', $status))
+        ->when($user_status, fn($q) => $q->where('user_status', $user_status))
+        ->latest()
+        ->get();
+
+    return view('overtime_applications.applications', compact('applications', 'status', 'user_status'));
+}
+
     
 
     /**

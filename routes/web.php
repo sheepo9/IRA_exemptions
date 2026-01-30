@@ -103,6 +103,16 @@ Route::get('overtime-applications/{id}/ded-download', [OvertimeApplicationContro
 Route::get('overtime-applications/{id}/ded-preview', [OvertimeApplicationController::class, 'previewDEDFile'])
      ->name('overtime-applications.ded-preview');
 
+
+Route::middleware(['auth'])->group(function () {
+
+    Route::get('/time', 
+        [OvertimeApplicationController::class, 'applications']
+    )->name('overtime-applications.applications');
+
+});
+
+
 //---------------------------------------------------------------------------------------------------
 //-------------------------------------wager Applications ---------------------------------------
 // custom routes

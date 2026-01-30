@@ -15,25 +15,36 @@
     @endif
 
     <a href="{{ route('overtime-applications.create') }}" class="btn btn-primary mb-3">+ New Application</a>
-   @role('Administrator')
-    <a href="{{ route('overtime-applications.index', ['status' => 'rejected_by_staff']) }}"
-       class="btn btn-primary mb-3">Rejected Applications</a>
-@endrole
+
  @role('Administrator')
-    <a href="{{ route('overtime-applications.index', ['status' => 'approved_by_ed']) }}"
-       class="btn btn-primary mb-3">Approved Applications</a>
-@endrole
+            <a href="{{ route('overtime-applications.applications', ['status' => 'rejected_by_staff']) }}"
+               class="btn btn-primary mb-3">
+                Rejected by Staff
+            </a>
 
-@role('Deputy_Director')
-    <a href="{{ route('overtime-applications.index', ['status' => 'reviewed_by_staff']) }}"
-       class="btn btn-warning mb-3">Pending Applications</a>
-@endrole
+            <a href="{{ route('overtime-applications.applications', ['status' => 'approved_by_ed']) }}"
+               class="btn btn-success mb-3">
+                Approved by ED
+            </a>
+        @endrole
 
-@role('Executive_Director')
-    <a href="{{ route('overtime-applications.index', ['status' => 'rejected_by_ded']) }}"
-       class="btn btn-danger mb-3">Rejected Applications</a>
-@endrole
+        @role('Deputy_Director')
+            <a href="{{ route('overtime-applications.applications', ['status' => 'reviewed_by_staff']) }}"
+               class="btn btn-warning mb-3">
+                Pending Applications
+            </a>
+        @endrole
 
+        @role('Executive_Director')
+            <a href="{{ route('overtime-applications.applications', ['status' => 'approved_by_ed']) }}"
+               class="btn btn-danger mb-3">
+                Rejected Applications
+            </a>
+             <a href="{{ route('overtime-applications.applications', ['user_status' => 'pending']) }}"
+               class="btn btn-info mb-3i">
+                Pending Applications
+            </a>
+        @endrole
     <table class="table table-bordered table-striped">
         <thead class="table-secondary">
             <tr>

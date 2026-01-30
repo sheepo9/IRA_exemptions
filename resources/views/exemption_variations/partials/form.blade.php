@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <div class="card shadow-sm">
     <div class="card-body">
 
@@ -112,12 +111,6 @@
     @endif
 
 
-=======
-<div class="mb-3">
-    <label>Applicant Name</label>
-    <input type="text" name="applicant_name" class="form-control"
-        value="{{ old('applicant_name', $exemption_variation->applicant_name ?? '') }}" required>
->>>>>>> parent of 6125d40 (Merge branch 'main' of https://github.com/VersaceVit07/IRA_exemptions)
 </div>
 
     </div>
