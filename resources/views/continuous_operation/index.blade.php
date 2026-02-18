@@ -7,97 +7,212 @@
             @include('layouts.sidebar')
         </div>
  <div class="col-md-9">
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Continuous Operation Applications</h2>
-    <a href="{{ route('operations.create') }}" class="btn btn-primary">New Application</a>
-</div>
+<div class="container mt-4">
+    <h2 class="mb-3"> Continuous Operations</h2>
 
-<div class="card">
-    <div class="card-body">
-        @if($applications->count() > 0)
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Employer Name</th>
-                            <th>Registration Number</th>
-                            <th>Contact Person</th>
-                            
-                             <th>Status</th>
-                           
-                            <th>Actions</th>
-                            <th>Download</th>
-                             @role('Administrator')
-                                        <th>Approve</th>
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
+    <a href="{{ route('operations.create') }}" class="btn btn-primary mb-3">+ New Application</a>
+
+ @role('Administrator')
+            <a href="{{ route('operations.applications', ['status' => 'rejected_by_staff']) }}"
+               class="btn btn-primary mb-3">
+                Rejected by Staff
+            </a>
+
+            <a href="{{ route('operations.applications', ['status' => 'approved_by_ed']) }}"
+               class="btn btn-success mb-3">
+                Approved by ED
+            </a>
+        @endrole
+
+        @role('Deputy_Director')
+            <a href="{{ route('operations.applications', ['status' => 'reviewed_by_staff']) }}"
+               class="btn btn-warning mb-3">
+                Pending Applications
+            </a>
+        @endrole
+
+        @role('Executive_Director')
+            <a href="{{ route('operations.applications', ['status' => 'approved_by_ed']) }}"
+               class="btn btn-danger mb-3">
+                Rejected Applications
+            </a>
+             <a href="{{ route('operations.applications', ['user_status' => 'pending']) }}"
+               class="btn btn-info mb-3i">
+                Pending Applications
+            </a>
+        @endrole
+    <table class="table table-bordered table-striped">
+        <thead class="table-secondary">
+            <tr>
+                <th>ID</th>
+                <th>Employer</th>
+                <th>Contact Person</th>
+                @role('User') <th>Status</th>
+                @endrole
+                 @role('Administrator|Deputy_Director|Deputy_Executive_Director|Executive_Director|Minister')
+                   <th>Internal Status</th>
+                 @endrole
+                 @role('User|Administrator|Deputy_Director|Deputy_Executive_Director')
+                 <th>Comment </th>   
+                 @endrole
+                                     @role('User')
+                                       <th>Actions</th>
+                                       <th>Download</th> 
+
                                     @endrole
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($applications as $application)
-                            <tr>
-                                <td>{{ $application->employer_name }}</td>
-                                <td>{{ $application->registration_number ?? 'N/A' }}</td>
-                                <td>{{ $application->contact_person ?? 'N/A' }}</td>
-                                <td>{{ $application->status ?? 'N/A' }}</td>
+                        
+                             @role('Administrator|Deputy_Director|Deputy_Executive_Director|Executive_Director|Minister')
+                                        <th>Review</th>
+                                    @endrole
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($applications as $app)
+            <tr>
+                <td>{{ $app->id }}</td>
+                <td>{{ $app->employer_name }}</td>
+                <td>{{ $app->contact_person }}</td>
+                @role('User') 
+                 <td>{{ $app->user_status }}</td>
+             @endrole
+                    @role('Administrator|Deputy_Director|Deputy_Executive_Director')
+                    <td>{{ $app->status }}</td>
+                    @endrole
+                 <td>
+                    @role('User')
+                    @if(!empty($app->staff_comment))
+                        <div class="text-muted">
+                            {{ $app->staff_comment}}
+                        </div>
+                     @else
+                            <div class="text-muted fst-italic">
+                                No comment yet
+                            </div>
+                        @endif
+                    @endrole
+                     @role('Administrator')
+                    @if(!empty($app->staff_comment))
+                        <div class="text-muted">
+                            {{ $app->DD_comment}}
+                        </div>
+                     @else
+                            <div class="text-muted fst-italic">
+                                No comment yet
+                            </div>
+                        @endif
+                    @endrole
+                     @role('Deputy_Director')
+                    @if(!empty($app->staff_comment))
+                        <div class="text-muted">
+                            {{ $app->DED_comment }}
+                        </div>
+                     @else
+                            <div class="text-muted fst-italic">
+                                No comment yet
+                            </div>
+                        @endif
+                    @endrole
+                     @role('Deputy_Executive_Director')
+                    @if(!empty($app->staff_comment))
+                        <div class="text-muted">
+                            {{ $app->ED_comment }}
+                        </div>
+                     @else
+                            <div class="text-muted fst-italic">
+                                No comment yet
+                            </div>
+                        @endif
+                    @endrole
+                     
+  </td>
+                                @role('User')
                                 <td>
-                                    <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('operations.show', $application->id) }}" 
-                                           class="btn btn-info">View</a>
-                                        <a href="{{ route('operations.edit', $application->id) }}" 
-                                           class="btn btn-warning">Edit</a>
-                                        <form action="{{ route('operations.destroy', $application->id) }}" 
-                                              method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger" 
-                                                    onclick="return confirm('Are you sure you want to delete this application?')">
-                                                Delete
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                                <td>
-                                @if(Auth::user()->hasRole('Administrator'))
-                                    {{-- Admin downloads the original application PDF --}}
-                                    <a href="{{ route('operations.pdf', $application->id) }}" class="btn btn-primary">
-                                        Download Application PDF
-                                    </a>
-                                @else
-                                    {{-- Normal user downloads the approved document --}}
-                                    @if($application->approved_document)
-                                        <a href="{{ route('operations.download', $application->id) }}" 
-                                        class="btn btn-outline-primary">
-                                            Download Approved Document
-                                        </a>
-                                    @else
-                                        <span class="text-muted">Not available</span>
-                                    @endif
-                                @endif
-                                            @role('Administrator')                                                                          
-                                <td>
-                                    <a href="{{ route('operations.approve', $application->id) }}" 
-                                           class="btn btn-warning">Approve</a>
-                                    </td>@endrole
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                                    <a href="{{ route('operations.show', $app->id) }}" class="btn btn-info btn-sm">View</a>
+                                    <a href="{{ route('operations.edit', $app->id) }}" class="btn btn-warning btn-sm">Edit</a>
 
-            <!-- Pagination -->
-            <div class="d-flex justify-content-center mt-4">
-                {{ $applications->links() }}
-            </div>
-        @else
-            <div class="text-center py-5">
-                <h4>No applications found</h4>
-                <p class="text-muted">You haven't submitted any continuous operation applications yet.</p>
-                <a href="{{ route('operations.create') }}" class="btn btn-primary">Create Your First Application</a>
-            </div>
+                                    <form action="{{ route('operations.destroy', $app->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-danger btn-sm" onclick="return confirm('Delete this record?')">Delete</button>
+                                    </form>
+                                </td> @endrole
+                                    @role('User') <td>
+                                   <div class="mb-3">
+  
+    <!-- Display DED file links if exists -->
+    @if( $app->getFirstMediaUrl('approval_certificates'))
+        <div class="mb-1">
+          
+                @if($app->status == 'approved_by_minister')
+            <a href="{{ route('operations.downloadApproval', $app->id) }}"
+            class="btn btn-success">
+                Download Approval Certificate
+            </a>
         @endif
-    </div>
+            </a>
+        </div>
+    @else
+        <span class="text-muted">No approved document attached yet.</span>
+    @endif
+
+
+                               @endrole </td>
+
+                                 
+                                    <td>
+                                @role('Deputy_Director')
+                                    @if($app->status === 'rejected_by_ded' || $app->status === 'reviewed_by_staff')
+                                        <a href="{{ route('operations.show', $app->id) }}" class="btn btn-warning btn-sm">
+                                            Review
+                                        </a>
+                                    @endif
+                                @endrole
+                                   
+                                     
+                                    @role('Deputy_Executive_Director')
+                                        @if($app->status === 'approved_by_dd'|| $app->status === 'rejected_by_ed')
+                                            <a href="{{ route('operations.show', $app->id) }}" class="btn btn-warning btn-sm">
+                                                Review
+                                            </a>
+                                        @endif
+                                    @endrole
+                                        
+                                    @role('Executive_Director')
+                                        @if($app->status === 'approved_by_ded')
+                                            <a href="{{ route('operations.show', $app->id) }}" class="btn btn-warning btn-sm">
+                                                Review
+                                            </a>
+                                        @endif
+                                    @endrole 
+
+                               @role('Minister')
+                                       @if($app->status === 'approved_by_ed')
+                                            <a href="{{ route('operations.show', $app->id) }}" class="btn btn-warning btn-sm">
+                                                Review
+                                            </a>
+                                        @endif
+                                                                            @endrole 
+                                            @role('Administrator')                                                                          
+                               
+                                    <a href="{{  route('operations.show', $app->id) }}" 
+                                           class="btn btn-warning">Review</a>
+                                    @endrole
+                                </td>
+            </tr>
+            @empty
+            <tr><td colspan="7" class="text-center">No applications found.</td></tr>
+            @endforelse
+        </tbody>
+    </table>
+
+    {{ $applications->links() }}
 </div>
-  </div>
-    </div>
-      </div>
+</div>
+</div>
+<p class="text-center text-primary"><small> &copy; {{ date('Y') }} Ministry of Justice & Labour (MoJLR). All rights reserved.</small></p>
+
 @endsection

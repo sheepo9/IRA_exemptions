@@ -51,13 +51,42 @@ Route::group(['middleware' => ['auth']], function() {
 Route::get('/operations/{id}/approve', [ContinuousOperationController::class, 'showApprovalForm'])->name('operations.approve.form');
 
 // ✅ Route for downloading the approved document
-    Route::get('operations/{id}/download', [ContinuousOperationController::class, 'downloadApprovedDocument'])
-        ->name('operations.download');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/operations/{id}/download-approval',
+        [ContinuousOperationController::class, 'downloadApproval']
+    )->name('operations.downloadApproval');
+});
+
 
     // ✅ Route for generating or downloading PDF (admin or user)
     Route::get('operations/{id}/pdf', [ContinuousOperationController::class, 'downloadPdf'])
         ->name('operations.pdf');
 
+
+Route::put(
+    '/operations/{ContinuosApplication}/review',
+    [ContinuousOperationController::class, 'review']
+)->name('operations.review');
+
+Route::get('operations/{id}/ded-download', [ContinuousOperationController::class, 'downloadDEDFile'])
+     ->name('operations.minister-download');
+
+Route::get('operations/{id}/ded-preview', [ContinuousOperationController::class, 'previewDEDFile'])
+     ->name('operations.minister-preview');
+
+
+Route::middleware(['auth'])->group(function () {
+
+    Route::get('/continouos_operations', 
+        [ContinuousOperationController::class, 'applications']
+    )->name('operations.applications');
+
+});
+
+Route::get('/acting-ded-notice', [ContinuousOperationController::class, 'actingDed']);
+
+Route::get('/verify/{reference}/{hash}', [ContinuousOperationController::class, 'verify'])
+    ->name('verify.certificate');
 
 //_--------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------
@@ -109,6 +138,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/time', 
         [OvertimeApplicationController::class, 'applications']
     )->name('overtime-applications.applications');
+ Route::get('/operations_view', 
+        [ContinuousOperationController::class, 'applications']
+    )->name('operations_view.applications');
 
 });
 

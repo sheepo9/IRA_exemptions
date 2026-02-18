@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Spatie\Permission\Models\Permission;
 
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 
 class ContinuousOperationController extends Controller
 {
@@ -26,23 +30,71 @@ class ContinuousOperationController extends Controller
     $this->middleware('permission:operation-delete', ['only' => ['destroy']]);
 }
 
-    public function index()
+    public function index(Request $request)
     {
-        //$applications = Continuous_operation::latest()->paginate(10);
+     $user = auth()->user();
 
-         if (Auth::user()->hasRole('Administrator')) {
-        // Admin sees all applications
-        $applications = Continuous_operation::latest()->paginate(10);
-    } else {
-        // Regular user sees only their own applications
-        $applications = Continuous_operation::where('user_id', Auth::id())
-                                            ->latest()
-                                            ->paginate(10);
+    $query = Continuous_operation::query();
+   
+if ($user->hasRole('User')) {
+   $query->where('user_id', $user->id)
+      ->where(function ($q) {
+          $q->whereIn('status', ['pending','rejected_by_staff'])
+            ->orWhereIn('user_status', ['pending','approved']);
+      });
 
+}
+
+if ($user->hasRole('Deputy_Director')) {
+    $query->whereIn('status', [
+        'reviewed_by_staff','rejected_by_ded'
+    ]);
+}
+if ($user->hasRole('Deputy_Executive_Director')) {
+    $query->whereIn('status', [
+        'approved_by_dd','rejected_by_ed'
+            ]);
+}
+
+    if ($user->hasRole('Executive_Director')) {
+        $query->where('status', 'approved_by_ded');
     }
-        return view('continuous_operation.index', compact('applications'));
+if ($user->hasRole('Administrator')) {
+    $query->whereIn('status', [
+        'pending','rejected_by_dd'
+    ]);
+}
+if ($user->hasRole('Minister')) {
+    $query->whereIn('status', [
+        'pending','approved_by_ed'
+    ]);
+}
+   $status = $request->status;
+
+    $applications = Continuous_operation::when($status, function ($q) use ($status) {
+        $q->where('status', $status);
+    })->get();
+
+
+    $applications = $query->paginate(10);
+      return view('continuous_operation.index', compact('applications'));
+    }
+      
+    public function applications(Request $request)
+{
+    $status = $request->query('status');          // e.g., pending
+    $user_status = $request->query('user_status'); // e.g., approved, rejected
+
+    $applications = Continuous_operation::query()
+        ->when($status, fn($q) => $q->where('status', $status))
+        ->when($user_status, fn($q) => $q->where('user_status', $user_status))
+        ->latest()
+        ->get();
+
+    return view('continuous_operation.applications', compact('applications', 'status', 'user_status'));
+}
+
     
-    }
 
     /**
      * Show the form for creating a new resource.
@@ -97,7 +149,7 @@ public function store(Request $request)
         public function show($id)
 {
     $application = Continuous_Operation::findOrFail($id);
-   $this->authorize('view', $application);
+   //$this->authorize('view', $application);
     if (Auth::user()->hasRole('Administrator')) {
         // Admin sees all pending applications
         $applications = Continuous_operation::where('status', 'Pending')
@@ -277,7 +329,7 @@ public function downloadpdf($id)
 public function downloadShiftRoster($id)
 {
     $application = Continuous_Operation::findOrFail($id);
-    $this->authorize('downloadShiftRoster', $application);
+    //$this->authorize('downloadShiftRoster', $application);
     $media = $application->getFirstMedia('shift_rosters');
 
     if (!$media) {
@@ -292,7 +344,7 @@ public function downloadShiftRoster($id)
 public function previewShiftRoster($id)
 {
     $application = Continuous_Operation::findOrFail($id);
-     $this->authorize('view', $application);
+     //$this->authorize('view', $application);
     $media = $application->getFirstMedia('shift_rosters');
 
     if (!$media) {
@@ -306,6 +358,318 @@ public function previewShiftRoster($id)
             'Content-Disposition' => 'inline; filename="' . $media->file_name . '"',
         ]
     );
+}
+
+
+public function review(Request $request, Continuous_Operation $ContinuosApplication)
+{
+    $user = auth()->user();
+
+    switch ($request->action) {
+
+        // ===== Administrator =====
+        case 'staff_approve':
+            $request->validate(['staff_comment' => 'nullable|string']);
+           $ContinuosApplication->update([
+                'staff_comment' => $request->staff_comment,
+                'status' => 'reviewed_by_staff',
+            ]);
+            break;
+
+        case 'staff_reject':
+            $request->validate(['staff_comment' => 'nullable|string']);
+           $ContinuosApplication->update([
+                'staff_comment' => $request->staff_comment,
+                'status' => 'rejected_by_staff',
+            ]);
+            break;
+
+        // ===== Deputy Director =====
+        case 'dd_approve':
+            $request->validate(['dd_comment' => 'nullable|string']);
+           $ContinuosApplication->update([
+                'DD_comment' => $request->dd_comment,
+                'status' => 'approved_by_dd',
+            ]);
+            break;
+
+        case 'dd_reject':
+            $request->validate(['dd_comment' => 'nullable|string']);
+           $ContinuosApplication->update([
+                'DD_comment' => $request->dd_comment,
+                'status' => 'rejected_by_dd',
+            ]);
+            break;
+
+        // ===== Deputy Executive Director =====
+        case 'ded_approve':
+            $request->validate(['ded_comment' => 'nullable|string']);
+           $ContinuosApplication->update([
+                'ded_comment' => $request->ded_comment,
+                'status' => 'approved_by_ded',
+            ]);
+            break;
+
+        case 'ded_reject':
+            $request->validate(['ded_comment' => 'nullable|string']);
+           $ContinuosApplication->update([
+                'ded_comment' => $request->ded_comment,
+                'status' => 'rejected_by_ded',
+            ]);
+            break;
+
+        /* ===== Executive Director =====
+        case 'ed_approve':
+            $request->validate(['ed_comment' => 'nullable|string']);
+           $ContinuosApplication->update([
+                'ed_comment' => $request->ed_comment,
+                'status' => 'approved_by_ed', 
+                'user_status' => 'approved', // final
+            ]);
+            break;
+
+        case 'ed_reject':
+            $request->validate(['ed_comment' => 'nullable|string']);
+           $ContinuosApplication->update([
+                'ed_comment' => $request->ed_comment,
+                'status' => 'rejected_by_ed', // final
+            ]);
+            break;    */ 
+        case 'ed_approve':
+       case 'ed_reject':
+            // Validate both comment and optional file
+            //dd('controller reached');
+
+            $request->validate([
+                'ed_comment' => 'nullable|string',
+                'ed_file' => 'nullable|file|mimes:pdf,doc,docx|max:5120', // max 5MB
+            ]);
+
+            // Update comment and status
+           $ContinuosApplication->update([
+                'ed_comment' => $request->ed_comment,
+                'status' => $request->action === 'ed_approve' ? 'approved_by_ed' : 'rejected_by_ed',
+                 'user_status' => 'approved', // final
+            ]);
+
+           if ($request->hasFile('ed_file')) {
+
+            Log::info('ED file detected');
+                Log::info('ED file upload', [
+                    'file' => $request->file('ed_file'),
+                ]);
+
+                    // Remove old ED file if exists
+                   $ContinuosApplication->clearMediaCollection('ed_files');
+
+                    // Add new ED file to 'ed_files' collection
+                   $ContinuosApplication
+                        ->addMediaFromRequest('ed_file')
+                        ->toMediaCollection('ed_files', 'public'); // optional: use public disk for public access
+                }
+
+            break;
+
+            /*
+            case 'minister_approve':
+       case 'minister_reject':
+            // Validate both comment and optional file
+            //dd('controller reached');
+
+            $request->validate([
+                'minister_comment' => 'nullable|string',
+                'minister_file' => 'nullable|file|mimes:pdf,doc,docx|max:5120', // max 5MB
+            ]);
+
+            // Update comment and status
+           $ContinuosApplication->update([
+                'minister_comment' => $request->ed_comment,
+                'status' => $request->action === 'minister_approve' ? 'approved_by_minister' : 'rejected_by_minister',
+                 'user_status' => 'approved', // final
+            ]);
+
+           if ($request->hasFile('minister_file')) {
+
+            Log::info('ED file detected');
+                Log::info('ED file upload', [
+                    'file' => $request->file('ed_file'),
+                ]);
+
+                    // Remove old ED file if exists
+                   $ContinuosApplication->clearMediaCollection('minister_files');
+
+                    // Add new ED file to 'ed_files' collection
+                   $ContinuosApplication
+                        ->addMediaFromRequest('minister_file')
+                        ->toMediaCollection('minister_files', 'public'); // optional: use public disk for public access
+                }
+
+            break;*/
+
+            case 'minister_approve':
+
+    /*$request->validate([
+        'minister_comment' => 'nullable|string',
+    ]);
+
+    // Generate Reference
+    $reference = 'CO-' . now()->format('Y') . '-' . str_pad($ContinuosApplication->id, 5, '0', STR_PAD_LEFT);
+
+    // Generate Verification Hash
+    $hash = hash('sha256', $reference . $ContinuosApplication->employer_name . now());
+
+    // Update application
+    $ContinuosApplication->update([
+        'minister_comment' => $request->minister_comment,
+        'status' => 'approved_by_minister',
+        'user_status' => 'approved',
+        'approval_reference' => $reference,
+        'approval_hash' => $hash,
+        'approved_at' => now(),
+    ]);
+
+    // Generate PDF
+    $pdf = Pdf::loadView('continuous_operation.approval_pdf', [
+        'application' => $ContinuosApplication,
+        'reference' => $reference,
+        'hash' => $hash,
+    ])->output();
+
+
+
+    // Remove old approval if exists
+    $ContinuosApplication->clearMediaCollection('approval_certificates');
+
+    // Store using Media Library
+    $ContinuosApplication
+        ->addMediaFromString($pdf)
+        ->usingFileName('Approval_' . $reference . '.pdf')
+        ->toMediaCollection('approval_certificates', 'public');
+*/
+
+$request->validate([
+    'minister_comment' => 'nullable|string',
+]);
+
+// Generate Reference
+$reference = 'CO-' . now()->format('Y') . '-' . str_pad($ContinuosApplication->id, 5, '0', STR_PAD_LEFT);
+
+// Generate Verification Hash
+$hash = hash('sha256', $reference . $ContinuosApplication->employer_name . now());
+
+// Generate Verification URL
+$verificationUrl = route('verify.certificate', [
+    'reference' => $reference,
+    'hash' => $hash
+]);
+
+// Create QR as SVG (NO GD REQUIRED)
+$renderer = new ImageRenderer(
+    new RendererStyle(180),
+    new SvgImageBackEnd()
+);
+
+$writer = new Writer($renderer);
+$qrCode = $writer->writeString($verificationUrl);
+
+// Update application
+$ContinuosApplication->update([
+    'minister_comment' => $request->minister_comment,
+    'status' => 'approved_by_minister',
+    'user_status' => 'approved',
+    'approval_reference' => $reference,
+    'approval_hash' => $hash,
+    'approved_at' => now(),
+]);
+
+// Generate PDF WITH QR
+$pdf = Pdf::loadView('continuous_operation.approval_pdf', [
+    'application' => $ContinuosApplication,
+    'reference' => $reference,
+    'hash' => $hash,
+    'qrCode' => $qrCode
+])->output();
+
+// Remove old approval if exists
+$ContinuosApplication->clearMediaCollection('approval_certificates');
+
+// Store using Media Library
+$ContinuosApplication
+    ->addMediaFromString($pdf)
+    ->usingFileName('Approval_' . $reference . '.pdf')
+    ->toMediaCollection('approval_certificates', 'public');
+
+
+    break;
+
+
+        default:
+            abort(400, 'Invalid action.');
+    }
+
+   return redirect()->route('operations.index')
+                 ->with('success', 'Application updated successfully!');
+
+} 
+
+                
+public function downloadDEDFile($id)
+{
+    $application = Continuous_Operation::findOrFail($id);
+
+    $media = $application->getFirstMedia('ed_files');
+
+    if (!$media) {
+        return back()->with('error', 'No DED document found.');
+    }
+
+    return response()->download(
+        $media->getPath(),
+        'DED_' . $application->employer_name . '.' . $media->extension // adjust as needed
+    );
+}
+public function previewDEDFile($id)
+{
+    $application = Continuous_Operation::findOrFail($id);
+
+    $media = $application->getFirstMedia('ed_files');
+
+    if (!$media) {
+        abort(404, 'DED document not found.');
+    }
+
+    return response()->file(
+        $media->getPath(),
+        [
+            'Content-Type' => $media->mime_type, // automatically detect MIME type
+            'Content-Disposition' => 'inline; filename="' . $media->file_name . '"',
+        ]
+    );
+}
+public function downloadApproval($id)
+{
+    $application = Continuous_Operation::findOrFail($id);
+
+    $media = $application->getFirstMedia('approval_certificates');
+
+    if (!$media) {
+        return back()->with('error', 'Approval certificate not found.');
+    }
+
+    return response()->download(
+        $media->getPath(),
+        $media->file_name
+    );
+}
+public function verify($reference, $hash)
+{
+    $application = Continuous_Operation::where('approval_reference', $reference)->firstOrFail();
+
+    if ($application->approval_hash !== $hash) {
+        abort(403, 'Invalid certificate');
+    }
+
+    return view('verification.valid', compact('application'));
 }
 
 
